@@ -27,7 +27,7 @@ public class RNCloverBridgePackage implements ReactPackage {
             ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new ReactNativeCloverSDKModule(reactContext));
+        modules.add(new RNCloverBridgeModule(reactContext));
 
         return modules;
     }
