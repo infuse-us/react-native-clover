@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ReactNativeCloverSDKPackage implements ReactPackage {
+public class RNCloverBridgePackage implements ReactPackage {
 
     // Deprecated from RN 0.47
     public List<Class<? extends JavaScriptModule>> createJSModules() {

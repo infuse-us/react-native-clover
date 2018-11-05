@@ -9,12 +9,12 @@ import com.facebook.react.bridge.ReactMethod;
 import java.util.HashMap;
 import java.util.Map;
 
-class ReactNativeCloverSDKModule extends ReactContextBaseJavaModule {
+class RNCloverBridgeModule extends ReactContextBaseJavaModule {
 
   private ReactContext mContext;
 
 
-  public ReactNativeCloverSDKModule(ReactApplicationContext reactContext) {
+  public RNCloverBridgeModule(ReactApplicationContext reactContext) {
     super(reactContext);
     mContext = reactContext;
   }
