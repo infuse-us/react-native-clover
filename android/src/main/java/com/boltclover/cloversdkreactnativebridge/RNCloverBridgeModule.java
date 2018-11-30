@@ -40,6 +40,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void disableCustomerMode() {
-    CustomerMode.disable(this.mContext, true);
+    CustomerMode.disable(this.mContext, false);
   }
 }
