@@ -76,7 +76,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
                 public void onServiceFailure(ResultStatus status) {
                     super.onServiceFailure(status);
                     Log.i(TAG, "onServiceFailure" + status);
-//                    promise.reject("onServiceFailure", "onServiceFailure");
                     promise.resolve(null);
                 }
 
@@ -84,7 +83,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
                 public void onServiceConnectionFailure() {
                     super.onServiceConnectionFailure();
                     Log.i(TAG, "onServiceConnectionFailure");
-//                    promise.reject("onServiceConnectionFailure", "onServiceConnectionFailure");
                     promise.resolve(null);
                 }
             });
