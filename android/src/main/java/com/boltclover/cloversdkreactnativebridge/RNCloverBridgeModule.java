@@ -110,14 +110,14 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     public void enableSound() {
         AudioManager audioManager;
         audioManager = (AudioManager) mContext.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
+        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_UNMUTE, 0);
     }
 
     @ReactMethod
     public void disableSound() {
         AudioManager audioManager;
         audioManager = (AudioManager) mContext.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, AudioManager.ADJUST_MUTE, 0);
     }
 
     private void startAccountChooser() {
