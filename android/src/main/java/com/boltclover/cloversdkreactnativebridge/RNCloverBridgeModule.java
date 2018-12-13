@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.media.AudioManager;
 
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.util.CustomerMode;
@@ -103,6 +104,20 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         WifiManager wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         int rssi = wifiManager.getConnectionInfo().getRssi();
         promise.resolve(rssi);
+    }
+
+    @ReactMethod
+    public void enableSound() {
+        AudioManager audioManager;
+        audioManager = (AudioManager) mContext.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
+    }
+
+    @ReactMethod
+    public void disableSound() {
+        AudioManager audioManager;
+        audioManager = (AudioManager) mContext.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
     }
 
     private void startAccountChooser() {
