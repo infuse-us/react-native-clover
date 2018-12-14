@@ -1,12 +1,16 @@
-package com.boltclover.cloversdkreactnativebridge;
+package com.infuse.cloversdkreactnativebridge;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.util.CustomerMode;
+import com.clover.sdk.v1.Intents;
 import com.clover.sdk.v1.ResultStatus;
 import com.clover.sdk.v1.ServiceConnector;
 import com.clover.sdk.v1.merchant.Merchant;
@@ -17,14 +21,17 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 class RNCloverBridgeModule extends ReactContextBaseJavaModule implements ServiceConnector.OnServiceConnectedListener {
 
     private static final String TAG = "RNCloverBridge";
+    private static final int SECURE_PAY_REQUEST = 0;
     private ReactContext mContext;
 
     private Account account;
@@ -43,14 +50,21 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     @Override
     public Map<String, Object> getConstants() {
         final Map<String, Object> constants = new HashMap<>();
+
+        WritableMap cardEntryMethods = Arguments.createMap();
+        cardEntryMethods.putInt("ICC_CONTACT", Intents.CARD_ENTRY_METHOD_ICC_CONTACT);
+        cardEntryMethods.putInt("MAG_STRIPE", Intents.CARD_ENTRY_METHOD_MAG_STRIPE);
+        cardEntryMethods.putInt("MANUAL", Intents.CARD_ENTRY_METHOD_MANUAL);
+        cardEntryMethods.putInt("NFC_CONTACTLESS", Intents.CARD_ENTRY_METHOD_NFC_CONTACTLESS);
+        cardEntryMethods.putInt("VAULTED_CARD", Intents.CARD_ENTRY_METHOD_VAULTED_CARD);
+
+        constants.put("CARD_ENTRY_METHOD", cardEntryMethods);
+
         return constants;
     }
 
     @ReactMethod
-    public void enableCustomerMode() {
-        Log.d("RNCloverBridge", "enabling customer mode");
-        CustomerMode.enable(this.mContext);
-    }
+    public void enableCustomerMode() { CustomerMode.enable(this.mContext); }
 
     @ReactMethod
     public void disableCustomerMode() {
@@ -65,8 +79,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
             merchantConnector.getMerchant(new MerchantConnector.MerchantCallback<Merchant>() {
                 @Override
                 public void onServiceSuccess(Merchant result, ResultStatus status) {
-                    super.onServiceSuccess(result, status);
-
                     WritableMap map = Arguments.createMap();
                     map.putString("merchantId", result.getId());
                     promise.resolve(map);
@@ -74,19 +86,20 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
                 @Override
                 public void onServiceFailure(ResultStatus status) {
-                    super.onServiceFailure(status);
-                    Log.i(TAG, "onServiceFailure" + status);
+                    Log.d(TAG, "onServiceFailure");
+                    Log.d(TAG, String.valueOf(status.getStatusCode()));
+                    Log.d(TAG, status.getStatusMessage());
                     promise.resolve(null);
                 }
 
                 @Override
                 public void onServiceConnectionFailure() {
-                    super.onServiceConnectionFailure();
-                    Log.i(TAG, "onServiceConnectionFailure");
+                    Log.d(TAG, "onServiceConnectionFailure");
                     promise.resolve(null);
                 }
             });
         } else {
+            Log.d(TAG, "No merchantConnector");
             promise.resolve(null);
         }
     }
@@ -103,6 +116,39 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         WifiManager wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         int rssi = wifiManager.getConnectionInfo().getRssi();
         promise.resolve(rssi);
+    }
+
+    @ReactMethod
+    public void startExternalSecurePayment(ReadableMap options) {
+        if (options.hasKey("amount") && options.hasKey("externalService")) {
+            int amount = options.getInt("amount");
+            String externalService = options.getString("externalService");
+
+            Intent payIntent = createExternalSecurePayIntent((long) amount, externalService);
+
+            if (options.hasKey("cardEntryFlag")) {
+                int cardEntryFlag = options.getInt("cardEntryFlag");
+                payIntent.putExtra(Intents.EXTRA_CARD_ENTRY_METHODS, cardEntryFlag);
+            }
+
+            getCurrentActivity().startActivityForResult(payIntent, SECURE_PAY_REQUEST);
+        } else {
+            Log.e(TAG, "Missing amount or externalService");
+        }
+    }
+
+    @ReactMethod
+    @TargetApi(27)
+    public void testAccountChooser() {
+        Intent intent = AccountManager.newChooseAccountIntent(
+                null,
+                null,
+                new String[]{CloverAccount.CLOVER_ACCOUNT_TYPE},
+                null,
+                null,
+                null,
+                null);
+        getCurrentActivity().startActivityForResult(intent, 1);
     }
 
     private void startAccountChooser() {
@@ -122,6 +168,18 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
             merchantConnector.disconnect();
             merchantConnector = null;
         }
+    }
+
+    private Intent createExternalSecurePayIntent(long amount, String externalService) {
+        Intent payIntent = new Intent("clover.intent.action.START_SECURE_PAYMENT");
+        payIntent.putExtra(Intents.EXTRA_AMOUNT, amount);
+        payIntent.putExtra(Intents.EXTRA_ORDER_ID, "2RQX89RBFSV8T");
+
+        HashMap extraValues = new HashMap<String, String>();
+        extraValues.put("PROCESS_PAYMENT_EXTERNAL_AUTH_SERVICE", externalService);
+        payIntent.putExtra(Intents.EXTRA_PASS_THROUGH_VALUES, (Serializable) extraValues);
+
+        return payIntent;
     }
 
     @Override
