@@ -1,7 +1,8 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.boltclover.cloversdkreactnativebridge">
+          package="com.infuse.cloversdkreactnativebridge">
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
 </manifest>
   
