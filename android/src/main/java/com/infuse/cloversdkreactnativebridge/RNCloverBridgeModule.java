@@ -3,11 +3,12 @@ package com.infuse.cloversdkreactnativebridge;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-import android.media.AudioManager;
 
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.util.CustomerMode;
@@ -16,6 +17,7 @@ import com.clover.sdk.v1.ResultStatus;
 import com.clover.sdk.v1.ServiceConnector;
 import com.clover.sdk.v1.merchant.Merchant;
 import com.clover.sdk.v1.merchant.MerchantConnector;
+import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -29,18 +31,25 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.app.Activity.RESULT_OK;
+
 class RNCloverBridgeModule extends ReactContextBaseJavaModule implements ServiceConnector.OnServiceConnectedListener {
 
     private static final String TAG = "RNCloverBridge";
     private static final int SECURE_PAY_REQUEST = 0;
+    private static final int REQUEST_PERMISSIONS = 1;
+    private static final int REQUEST_ACCOUNT = 2;
     private ReactContext mContext;
 
     private Account account;
     private MerchantConnector merchantConnector;
 
+    private Promise accountPromise;
+
     public RNCloverBridgeModule(ReactApplicationContext reactContext) {
         super(reactContext);
         mContext = reactContext;
+        reactContext.addActivityEventListener(mActivityEventListener);
     }
 
     @Override
@@ -140,16 +149,24 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     @ReactMethod
     @TargetApi(27)
-    public void testAccountChooser() {
-        Intent intent = AccountManager.newChooseAccountIntent(
-                null,
-                null,
-                new String[]{CloverAccount.CLOVER_ACCOUNT_TYPE},
-                null,
-                null,
-                null,
-                null);
-        getCurrentActivity().startActivityForResult(intent, 1);
+    public void startAccountChooserIfNeeded(Promise promise) {
+        startAccountChooser();
+        if (account != null) {
+            WritableMap map = Arguments.createMap();
+            map.putBoolean("success", true);
+            promise.resolve(map);
+        } else {
+            accountPromise = promise;
+            Intent accountIntent = AccountManager.newChooseAccountIntent(
+                    null,
+                    null,
+                    new String[]{CloverAccount.CLOVER_ACCOUNT_TYPE},
+                    null,
+                    null,
+                    null,
+                    null);
+            getCurrentActivity().startActivityForResult(accountIntent, REQUEST_ACCOUNT);
+        }
     }
 
     @ReactMethod
@@ -206,4 +223,24 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     public void onServiceDisconnected(ServiceConnector connector) {
         Log.i(TAG, "service disconnected: " + connector);
     }
+
+    private final ActivityEventListener mActivityEventListener = new ActivityEventListener() {
+        @Deprecated
+        public void onActivityResult(int requestCode, int resultCode, Intent data) { }
+
+        public void onActivityResult(Activity activity,  int requestCode, int resultCode, Intent data) {
+            if (requestCode == REQUEST_ACCOUNT) {
+                WritableMap map = Arguments.createMap();
+                if (resultCode == RESULT_OK) {
+                    map.putBoolean("success", true);
+                    accountPromise.resolve(map);
+                } else {
+                    map.putBoolean("success", false);
+                    accountPromise.resolve(map);
+                }
+            }
+        }
+
+        public void onNewIntent(Intent intent) { }
+    };
 }
