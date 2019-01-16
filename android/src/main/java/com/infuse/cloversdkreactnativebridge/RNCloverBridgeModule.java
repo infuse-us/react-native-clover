@@ -45,6 +45,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     private MerchantConnector merchantConnector;
 
     private Promise accountPromise;
+    private Promise paymentPromise;
 
     public RNCloverBridgeModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -129,7 +130,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     }
 
     @ReactMethod
-    public void startExternalSecurePayment(ReadableMap options) {
+    public void startExternalSecurePayment(ReadableMap options, Promise promise) {
         if (options.hasKey("amount") && options.hasKey("externalService")) {
             int amount = options.getInt("amount");
             String externalService = options.getString("externalService");
@@ -141,6 +142,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
                 payIntent.putExtra(Intents.EXTRA_CARD_ENTRY_METHODS, cardEntryFlag);
             }
 
+            paymentPromise = promise;
             getCurrentActivity().startActivityForResult(payIntent, SECURE_PAY_REQUEST);
         } else {
             Log.e(TAG, "Missing amount or externalService");
@@ -238,6 +240,10 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
                     map.putBoolean("success", false);
                     accountPromise.resolve(map);
                 }
+            } else if (requestCode == SECURE_PAY_REQUEST) {
+                WritableMap map = Arguments.createMap();
+                map.putBoolean("success", resultCode == RESULT_OK);
+                paymentPromise.resolve(map);
             }
         }
 
