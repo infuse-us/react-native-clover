@@ -4,10 +4,12 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
+import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.media.AudioManager;
 import android.util.Log;
 
 import com.clover.sdk.util.CloverAccount;
@@ -28,7 +30,10 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
 import java.io.Serializable;
+import java.net.NetworkInterface;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
@@ -127,6 +132,46 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         WifiManager wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         int rssi = wifiManager.getConnectionInfo().getRssi();
         promise.resolve(rssi);
+    }
+
+    @ReactMethod
+    public void getIPAddress(Promise promise) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getApplicationContext().getSystemService(Service.CONNECTIVITY_SERVICE);
+        List addresses = connectivityManager.getLinkProperties(connectivityManager.getActiveNetwork()).getLinkAddresses();
+        String ipAddress = addresses.get(1).toString();
+        promise.resolve(ipAddress);
+    }
+
+    @ReactMethod
+    public static void getEthernetMacAddress(Promise promise) {
+        String macAddress = "Not able to read";
+        try {
+            List<NetworkInterface> allNetworkInterfaces = Collections.list(NetworkInterface
+                    .getNetworkInterfaces());
+            for (NetworkInterface nif : allNetworkInterfaces) {
+                if (!nif.getName().equalsIgnoreCase("eth0"))
+                    continue;
+
+                byte[] macBytes = nif.getHardwareAddress();
+                if (macBytes == null) {
+                    promise.resolve(macAddress);
+                }
+
+                StringBuilder res1 = new StringBuilder();
+                for (byte b : macBytes) {
+                    res1.append(String.format("%02X:", b));
+                }
+
+                if (res1.length() > 0) {
+                    res1.deleteCharAt(res1.length() - 1);
+                }
+                macAddress = res1.toString();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        promise.resolve(macAddress);
     }
 
     @ReactMethod
