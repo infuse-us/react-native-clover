@@ -164,13 +164,12 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
                 if (res1.length() > 0) {
                     res1.deleteCharAt(res1.length() - 1);
                 }
+                promise.resolve(res1.toString());
             }
-            promise.resolve(res1.toString());
         } catch (Exception ex) {
             ex.printStackTrace();
             promise.reject("404", "Interface Error");
         }
-
     }
 
     @ReactMethod
