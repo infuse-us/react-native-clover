@@ -144,7 +144,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     @ReactMethod
     public static void getEthernetMacAddress(Promise promise) {
-        String macAddress = "Not able to read";
         try {
             List<NetworkInterface> allNetworkInterfaces = Collections.list(NetworkInterface
                     .getNetworkInterfaces());
@@ -154,7 +153,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
                 byte[] macBytes = nif.getHardwareAddress();
                 if (macBytes == null) {
-                    promise.resolve(macAddress);
+                    promise.reject("404", "Not Found");
                 }
 
                 StringBuilder res1 = new StringBuilder();
@@ -165,13 +164,13 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
                 if (res1.length() > 0) {
                     res1.deleteCharAt(res1.length() - 1);
                 }
-                macAddress = res1.toString();
             }
+            promise.resolve(res1.toString());
         } catch (Exception ex) {
             ex.printStackTrace();
+            promise.reject("404", "Interface Error");
         }
 
-        promise.resolve(macAddress);
     }
 
     @ReactMethod
