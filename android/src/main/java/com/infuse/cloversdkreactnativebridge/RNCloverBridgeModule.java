@@ -7,29 +7,12 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.media.AudioManager;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.LayoutInflater;
-import android.view.Gravity;
-import android.widget.TextView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.RelativeLayout;
-import android.widget.LinearLayout;
 
-import android.widget.EditText;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.os.AsyncTask;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.BitmapFactory;
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.util.CustomerMode;
 import com.clover.sdk.v1.Intents;
@@ -47,31 +30,12 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
-import com.clover.sdk.v1.printer.Category;
-import com.clover.sdk.v1.printer.Printer;
-import com.clover.sdk.v1.printer.PrinterConnector;
-import com.clover.sdk.v1.printer.Type;
-
-import com.clover.sdk.v1.printer.job.ImagePrintJob;
-import com.clover.sdk.v1.printer.job.PrintJob;
-import com.clover.sdk.v1.printer.job.PrintJobsConnector;
-import com.clover.sdk.v1.printer.job.PrintJobsContract;
-import com.clover.sdk.v1.printer.job.TextPrintJob;
-import com.clover.sdk.v1.printer.job.ViewPrintJob;
-
 import java.io.Serializable;
-import java.io.InputStream;
-import java.io.File;
-import java.net.URL;
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.zip.Inflater;
-import java.util.Enumeration;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -88,42 +52,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     private Promise accountPromise;
     private Promise paymentPromise;
-
-    private PrinterConnector connector;
-
-    private EditText editPrinterId;
-
-    private EditText editPrintOrderId;
-    private Button buttonPrintOrderReceipt;
-
-    private EditText editPrintImageUrl;
-    private Button buttonPrintImage;
-    private Button buttonPrintImageSync;
-
-    private EditText editPrintText;
-    private Button buttonPrintText;
-
-    private PrinterConnector printerConnector;
-
-    private Printer getPrinter() {
-        printerConnector = new PrinterConnector(getCurrentActivity(), account, null);
-        Log.d(TAG, "GOT TO GET PRINTER!+!+!+!+!+! ");
-
-    try {
-       List<Printer> printers = printerConnector.getPrinters();
-       if (printers != null && !printers.isEmpty()) {
-        Log.d(TAG, "YES?!!");
-         return printers.get(0);
-       }else{
-        Log.d(TAG, "I Guess it is empty");
-       }
-     } catch (Exception e) {
-       e.printStackTrace();
-     }
-     return null;
-
-    }
-
 
     public RNCloverBridgeModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -154,49 +82,9 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     @ReactMethod
     public void print(final String receiptPath, final Promise promise) {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-                try {
-                    InputStream is = (InputStream) new URL(receiptPath).getContent();
-                    Bitmap b = BitmapFactory.decodeStream(is);
-                    PrintJob imagePrintJob = new ImagePrintJob.Builder().bitmap(b).build();
-                    Printer p = getPrinter();
-                    PrintJobsConnector printerJobsConnector = new PrintJobsConnector(getCurrentActivity());
-                    printerJobsConnector.print( p,imagePrintJob);
-                    List<String> ids = printerJobsConnector.getPrintJobIds(PrintJobsContract.STATE_IN_QUEUE);
-
-                    while (printerJobsConnector.getState(ids.get(0)) != PrintJobsContract.STATE_DONE) {
-                        Log.d(TAG, "Receipt is printing");
-                    }
-
-                    Log.d(TAG, "Printing finished");
-
-                    File file = new File(receiptPath);
-
-                    if(file.delete()) {
-                       Log.d(TAG, "File deleted successfully");
-                    }else{
-                        Log.d(TAG, "File was not deleted");
-                    };
-
-                    return ids.get(0);
-                } catch (Exception e) {
-                    promise.reject("Error printing");
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(String id) {
-                if (id != null) {
-                    promise.resolve("Print job: " + id + " has finished");
-                } else {
-                    promise.resolve("Printing error");
-                }
-            }
-        }.execute();
+        Receipt receipt = new Receipt();
+        Activity currentActivity = getCurrentActivity();
+        receipt.print(currentActivity, account, promise, receiptPath);
     }
 
     @ReactMethod
