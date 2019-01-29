@@ -20,10 +20,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
-public class Receipt {
+public class PrinterWrapper {
 
-    private static final String TAG = "Receipt";
-
+    private static final String TAG = "PrinterWrapper";
     private PrinterConnector printerConnector;
 
     public Printer getPrinter(Activity currentActivity, Account account) {
@@ -43,17 +42,12 @@ public class Receipt {
         return null;
     }
 
-    public void print(final Activity currentActivity, final Account account, final Promise promise, final String receiptPath) {
-        Log.d(TAG, "got the tag" + receiptPath);
-        Log.d(TAG, "Got to print inside the class");
-
-        Log.d(TAG, "Got to print inside the class");
-
+    public void print(final Activity currentActivity, final Account account, final Promise promise, final String imagePath) {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
                 try {
-                    InputStream is = (InputStream) new URL(receiptPath).getContent();
+                    InputStream is = (InputStream) new URL(imagePath).getContent();
                     Bitmap b = BitmapFactory.decodeStream(is);
                     PrintJob imagePrintJob = new ImagePrintJob.Builder().bitmap(b).build();
                     Printer p = getPrinter(currentActivity, account);
@@ -62,12 +56,12 @@ public class Receipt {
                     List<String> ids = printerJobsConnector.getPrintJobIds(PrintJobsContract.STATE_IN_QUEUE);
 
                     while (printerJobsConnector.getState(ids.get(0)) != PrintJobsContract.STATE_DONE) {
-                        Log.d(TAG, "Receipt is printing");
+                        Log.d(TAG, "Printing");
                     }
 
                     Log.d(TAG, "Printing finished");
 
-                    File file = new File(receiptPath);
+                    File file = new File(imagePath);
 
                     if(file.delete()) {
                         Log.d(TAG, "File deleted successfully");
@@ -84,14 +78,12 @@ public class Receipt {
 
             @Override
             protected void onPostExecute(String id) {
-
-                promise.resolve("THIS WORKED!");
                 Log.d(TAG, "Got to onPostExecute");
-//                if (id != null) {
-//                    return "Print job has finished";
-//                } else {
-//                    return "Printing error";
-//                }
+               if (id != null) {
+                    promise.resolve("Print job has finished");
+               } else {
+                    promise.resolve("Print job has finished");
+               }
             }
         }.execute();
 
