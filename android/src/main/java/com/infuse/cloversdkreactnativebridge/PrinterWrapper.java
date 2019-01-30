@@ -81,7 +81,7 @@ public class PrinterWrapper {
                if (id != null) {
                     promise.resolve("Print job has finished");
                } else {
-                    promise.resolve("Print job has finished");
+                    promise.reject("Printing Error","Printing job did not finish properly.");
                }
             }
         }.execute();
