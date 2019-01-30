@@ -77,7 +77,6 @@ public class PrinterWrapper {
 
             @Override
             protected void onPostExecute(String id) {
-                Log.d(TAG, "Got to onPostExecute");
                if (id != null) {
                     promise.resolve("Print job has finished");
                } else {
