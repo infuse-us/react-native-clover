@@ -27,11 +27,9 @@ public class PrinterWrapper {
 
     public Printer getPrinter(Activity currentActivity, Account account) {
         printerConnector = new PrinterConnector(currentActivity, account, null);
-        Log.d(TAG, "GOT TO GET PRINTER!+!+!+!+!+! ");
         try {
             List<Printer> printers = printerConnector.getPrinters();
             if (printers != null && !printers.isEmpty()) {
-                Log.d(TAG, "YES?!!");
                 return printers.get(0);
             }else{
                 Log.d(TAG, "No printer found");
