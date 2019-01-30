@@ -57,9 +57,10 @@ public class PrinterWrapper {
                         Log.d(TAG, "Printing");
                     }
 
-                    Log.d(TAG, "Printing finished");
+                    Log.d(TAG, "Printing finished!");
 
-                    File file = new File(imagePath);
+                    String imageToDelete = imagePath.replace("file:///","");
+                    File file = new File(imageToDelete);
 
                     if(file.delete()) {
                         Log.d(TAG, "File deleted successfully");
@@ -84,8 +85,6 @@ public class PrinterWrapper {
                }
             }
         }.execute();
-
-
     }
 }
 
