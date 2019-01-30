@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.media.AudioManager;
@@ -77,6 +78,13 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         constants.put("CARD_ENTRY_METHOD", cardEntryMethods);
 
         return constants;
+    }
+
+    @ReactMethod
+    public void print(final String imagePath, final Promise promise) {
+        PrinterWrapper printerWrapper = new PrinterWrapper();
+        Activity currentActivity = getCurrentActivity();
+        printerWrapper.print(currentActivity, account, promise, imagePath);
     }
 
     @ReactMethod
