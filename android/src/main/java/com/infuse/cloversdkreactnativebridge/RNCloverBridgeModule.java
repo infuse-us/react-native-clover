@@ -8,9 +8,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 
+import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
-import android.media.AudioManager;
 import android.util.Log;
 
 import com.clover.sdk.util.CloverAccount;
@@ -30,7 +30,6 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
-import java.io.Serializable;
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,7 +41,6 @@ import static android.app.Activity.RESULT_OK;
 class RNCloverBridgeModule extends ReactContextBaseJavaModule implements ServiceConnector.OnServiceConnectedListener {
 
     private static final String TAG = "RNCloverBridge";
-    private static final int SECURE_PAY_REQUEST = 0;
     private static final int REQUEST_PERMISSIONS = 1;
     private static final int REQUEST_ACCOUNT = 2;
     private ReactContext mContext;
@@ -143,6 +141,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     }
 
     @ReactMethod
+    @TargetApi(27)
     public void getIPAddress(Promise promise) {
         ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getApplicationContext().getSystemService(Service.CONNECTIVITY_SERVICE);
         List addresses = connectivityManager.getLinkProperties(connectivityManager.getActiveNetwork()).getLinkAddresses();
@@ -182,21 +181,12 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     @ReactMethod
     public void startExternalSecurePayment(ReadableMap options, Promise promise) {
+        paymentPromise = promise;
         if (options.hasKey("amount") && options.hasKey("externalService")) {
-            int amount = options.getInt("amount");
-            String externalService = options.getString("externalService");
-
-            Intent payIntent = createExternalSecurePayIntent((long) amount, externalService);
-
-            if (options.hasKey("cardEntryFlag")) {
-                int cardEntryFlag = options.getInt("cardEntryFlag");
-                payIntent.putExtra(Intents.EXTRA_CARD_ENTRY_METHODS, cardEntryFlag);
-            }
-
-            paymentPromise = promise;
-            getCurrentActivity().startActivityForResult(payIntent, SECURE_PAY_REQUEST);
+            new ExternalSecurePaymentTask(getCurrentActivity(), options).execute();
         } else {
             Log.e(TAG, "Missing amount or externalService");
+            promise.reject("Error", "Missing amount or externalService");
         }
     }
 
@@ -255,18 +245,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         }
     }
 
-    private Intent createExternalSecurePayIntent(long amount, String externalService) {
-        Intent payIntent = new Intent("clover.intent.action.START_SECURE_PAYMENT");
-        payIntent.putExtra(Intents.EXTRA_AMOUNT, amount);
-        payIntent.putExtra(Intents.EXTRA_ORDER_ID, "2RQX89RBFSV8T");
-
-        HashMap extraValues = new HashMap<String, String>();
-        extraValues.put("PROCESS_PAYMENT_EXTERNAL_AUTH_SERVICE", externalService);
-        payIntent.putExtra(Intents.EXTRA_PASS_THROUGH_VALUES, (Serializable) extraValues);
-
-        return payIntent;
-    }
-
     @Override
     public void onServiceConnected(ServiceConnector connector) {
         Log.i(TAG, "service connected: " + connector);
@@ -284,14 +262,9 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         public void onActivityResult(Activity activity,  int requestCode, int resultCode, Intent data) {
             if (requestCode == REQUEST_ACCOUNT) {
                 WritableMap map = Arguments.createMap();
-                if (resultCode == RESULT_OK) {
-                    map.putBoolean("success", true);
-                    accountPromise.resolve(map);
-                } else {
-                    map.putBoolean("success", false);
-                    accountPromise.resolve(map);
-                }
-            } else if (requestCode == SECURE_PAY_REQUEST) {
+                map.putBoolean("success", resultCode == RESULT_OK);
+                accountPromise.resolve(map);
+            } else if (requestCode == ExternalSecurePaymentTask.SECURE_PAY_REQUEST) {
                 WritableMap map = Arguments.createMap();
                 map.putBoolean("success", resultCode == RESULT_OK);
                 paymentPromise.resolve(map);
