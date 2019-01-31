@@ -23,7 +23,6 @@ public class ExternalSecurePaymentTask extends AsyncTask<Void, Void, Intent> {
 
     @Override
     protected Intent doInBackground(Void... voids) {
-//        Activity currentActivity = getCurrentActivity();
         int amount = options.getInt("amount");
         String externalService = options.getString("externalService");
 
@@ -40,7 +39,6 @@ public class ExternalSecurePaymentTask extends AsyncTask<Void, Void, Intent> {
     @Override
     protected void onPostExecute(Intent payIntent) {
         super.onPostExecute(payIntent);
-//        getCurrentActivity().startActivityForResult(payIntent, SECURE_PAY_REQUEST);
         currentActivity.startActivityForResult(payIntent, SECURE_PAY_REQUEST);
     }
 
