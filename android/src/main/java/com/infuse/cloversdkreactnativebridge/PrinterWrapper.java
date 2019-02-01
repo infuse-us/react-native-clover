@@ -18,12 +18,19 @@ import com.facebook.react.bridge.Promise;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PrinterWrapper {
 
     private static final String TAG = "PrinterWrapper";
     private PrinterConnector printerConnector;
+    private Promise promise;
+
+    public PrinterWrapper(Promise promise){
+        this.promise = promise;
+    }
 
     public Printer getPrinter(Activity currentActivity, Account account) {
         printerConnector = new PrinterConnector(currentActivity, account, null);
@@ -33,14 +40,16 @@ public class PrinterWrapper {
                 return printers.get(0);
             }else{
                 Log.d(TAG, "No printer found");
+                promise.reject("Printing Error","Printing job did not finish properly.");
             }
         } catch (Exception e) {
+            promise.reject("Printing Error","getPrinter error");
             e.printStackTrace();
         }
         return null;
     }
 
-    public void print(final Activity currentActivity, final Account account, final Promise promise, final String imagePath) {
+    public void print(final Activity currentActivity, final Account account, final String imagePath) {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -55,9 +64,12 @@ public class PrinterWrapper {
 
                     while (printerJobsConnector.getState(ids.get(0)) != PrintJobsContract.STATE_DONE) {
                         Log.d(TAG, "Printing");
+                        if(printerJobsConnector.getState(ids.get(0)) == PrintJobsContract.STATE_ERROR){
+                            return "Error while printing";
+                        }
                     }
 
-                    Log.d(TAG, "Printing finished!");
+                    Log.d(TAG, "Printing finished");
 
                     String imageToDelete = imagePath.replace("file:///","");
                     File file = new File(imageToDelete);
@@ -68,7 +80,7 @@ public class PrinterWrapper {
                         Log.d(TAG, "File was not deleted");
                     };
 
-                    return ids.get(0);
+                    return "";
                 } catch (Exception e) {
                     e.printStackTrace();
                     return "Error printing";
@@ -76,11 +88,11 @@ public class PrinterWrapper {
             }
 
             @Override
-            protected void onPostExecute(String id) {
-               if (id != null) {
-                    promise.resolve("Print job has finished");
+            protected void onPostExecute(final String response) {
+               if (response == "") {
+                   promise.resolve("Printed successfully");
                } else {
-                    promise.reject("Printing Error","Printing job did not finish properly.");
+                   promise.reject("Printing Error", "Printing job did not finish properly.");
                }
             }
         }.execute();

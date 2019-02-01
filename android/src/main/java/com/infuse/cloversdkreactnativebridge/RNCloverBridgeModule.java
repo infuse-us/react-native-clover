@@ -80,9 +80,9 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     @ReactMethod
     public void print(final String imagePath, final Promise promise) {
-        PrinterWrapper printerWrapper = new PrinterWrapper();
+        PrinterWrapper printerWrapper = new PrinterWrapper(promise);
         Activity currentActivity = getCurrentActivity();
-        printerWrapper.print(currentActivity, account, promise, imagePath);
+        printerWrapper.print(currentActivity, account, imagePath);
     }
 
     @ReactMethod
