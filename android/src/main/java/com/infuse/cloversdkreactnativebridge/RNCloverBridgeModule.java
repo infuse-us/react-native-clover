@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
@@ -16,9 +15,7 @@ import android.util.Log;
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.util.CustomerMode;
 import com.clover.sdk.v1.Intents;
-import com.clover.sdk.v1.ResultStatus;
 import com.clover.sdk.v1.ServiceConnector;
-import com.clover.sdk.v1.merchant.Merchant;
 import com.clover.sdk.v1.merchant.MerchantConnector;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
@@ -98,28 +95,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         startAccountChooser();
         connect();
         if (merchantConnector != null) {
-            merchantConnector.getMerchant(new MerchantConnector.MerchantCallback<Merchant>() {
-                @Override
-                public void onServiceSuccess(Merchant result, ResultStatus status) {
-                    WritableMap map = Arguments.createMap();
-                    map.putString("merchantId", result.getId());
-                    promise.resolve(map);
-                }
-
-                @Override
-                public void onServiceFailure(ResultStatus status) {
-                    Log.d(TAG, "onServiceFailure");
-                    Log.d(TAG, String.valueOf(status.getStatusCode()));
-                    Log.d(TAG, status.getStatusMessage());
-                    promise.resolve(null);
-                }
-
-                @Override
-                public void onServiceConnectionFailure() {
-                    Log.d(TAG, "onServiceConnectionFailure");
-                    promise.resolve(null);
-                }
-            });
+            merchantConnector.getMerchant(new MerchantCallbackTask(promise));
         } else {
             Log.d(TAG, "No merchantConnector");
             promise.resolve(null);
