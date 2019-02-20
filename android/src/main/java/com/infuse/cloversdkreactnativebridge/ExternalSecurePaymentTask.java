@@ -46,6 +46,8 @@ public class ExternalSecurePaymentTask extends AsyncTask<Void, Void, Intent> {
         Intent payIntent = new Intent("clover.intent.action.START_SECURE_PAYMENT");
         payIntent.putExtra(Intents.EXTRA_AMOUNT, amount);
         payIntent.putExtra(Intents.EXTRA_ORDER_ID, "2RQX89RBFSV8T");
+        payIntent.putExtra(Intents.EXTRA_DUPLICATE_PAYMENT_CONFIRMATION, true);
+        payIntent.putExtra(Intents.EXTRA_DISABLE_RESTART_TRANSACTION_WHEN_FAILED, true);
 
         HashMap extraValues = new HashMap<String, String>();
         extraValues.put("PROCESS_PAYMENT_EXTERNAL_AUTH_SERVICE", externalService);
