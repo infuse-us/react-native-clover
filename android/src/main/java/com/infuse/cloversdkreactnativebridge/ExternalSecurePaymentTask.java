@@ -33,6 +33,13 @@ public class ExternalSecurePaymentTask extends AsyncTask<Void, Void, Intent> {
             payIntent.putExtra(Intents.EXTRA_CARD_ENTRY_METHODS, cardEntryFlag);
         }
 
+        if (options.hasKey("isRefund")) {
+            boolean isRefund = options.getBoolean("isRefund");
+            if (isRefund) {
+                payIntent.putExtra(Intents.EXTRA_TRANSACTION_TYPE, Intents.TRANSACTION_TYPE_CREDIT);
+            }
+        }
+
         return payIntent;
     }
 
