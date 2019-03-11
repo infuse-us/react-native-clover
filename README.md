@@ -44,6 +44,7 @@ Clover.print(String imagePath).then(...);
 Clover.startExternalSecurePayment({
   amount: int,
   externalService: string,
+  isRefund: boolean,
   cardEntryFlag: Clover.CARD_ENTRY_METHOD.MAG_STRIPE,
 }).then(...);
 
