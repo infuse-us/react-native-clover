@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 
 import com.clover.sdk.v1.Intents;
+import com.clover.sdk.v3.payments.DataEntryLocation;
 import com.clover.sdk.v3.payments.TransactionSettings;
 import com.facebook.react.bridge.ReadableMap;
 
@@ -56,6 +57,7 @@ public class ExternalSecurePaymentTask extends AsyncTask<Void, Void, Intent> {
         payIntent.putExtra(Intents.EXTRA_ORDER_ID, "2RQX89RBFSV8T");
 
         TransactionSettings transactionSettings = new TransactionSettings();
+        transactionSettings.setSignatureEntryLocation(DataEntryLocation.NONE);
         transactionSettings.setDisableDuplicateCheck(true);
         transactionSettings.setDisableReceiptSelection(true);
         transactionSettings.setDisableRestartTransactionOnFailure(true);
