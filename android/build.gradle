@@ -35,5 +35,6 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.aar"])
     implementation 'com.facebook.react:react-native:+'
     implementation 'com.clover.sdk:clover-android-sdk:latest.release'
+    implementation 'com.clover.sdk:clover-android-connector-sdk:latest.release'
 }
   

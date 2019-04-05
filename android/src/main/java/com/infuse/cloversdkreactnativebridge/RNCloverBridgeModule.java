@@ -10,13 +10,18 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.WindowManager;
 
+import com.clover.connector.sdk.v3.PaymentConnector;
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.util.CustomerMode;
 import com.clover.sdk.v1.Intents;
 import com.clover.sdk.v1.ServiceConnector;
 import com.clover.sdk.v1.merchant.MerchantConnector;
+import com.clover.sdk.v3.connector.ExternalIdUtils;
+import com.clover.sdk.v3.remotepay.SaleRequest;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -72,6 +77,9 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
         constants.put("CARD_ENTRY_METHOD", cardEntryMethods);
 
+        constants.put("isFlex", isFlex());
+        constants.put("isMini", isMini());
+
         return constants;
     }
 
@@ -100,6 +108,23 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
             Log.d(TAG, "No merchantConnector");
             promise.resolve(null);
         }
+    }
+
+    private boolean isFlex() {
+        return getWidthInDP() == 360;
+    }
+
+    private boolean isMini() {
+        return getWidthInDP() >= 960;
+    }
+
+    private int getWidthInDP() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        WindowManager windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+
+        int widthInDP = Math.round(displayMetrics.widthPixels / displayMetrics.density);
+        return widthInDP;
     }
 
     @ReactMethod
@@ -164,6 +189,18 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
             Log.e(TAG, "Missing amount or externalService");
             promise.reject("Error", "Missing amount or externalService");
         }
+    }
+
+    @ReactMethod
+    public void startSecurePayment(ReadableMap options, Promise promise) {
+        Account account = CloverAccount.getAccount(mContext);
+        PaymentConnector paymentConnector = new PaymentConnector(getCurrentActivity().getApplicationContext(), account, new ReactPaymentConnectorListener(promise));
+        int amount = options.getInt("amount");
+        SaleRequest saleRequest = new SaleRequest();
+        saleRequest.setAmount((long) amount);
+        saleRequest.setExternalId(ExternalIdUtils.generateNewID());
+
+        paymentConnector.sale(saleRequest);
     }
 
     @ReactMethod
