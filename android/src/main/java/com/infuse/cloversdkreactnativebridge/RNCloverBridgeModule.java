@@ -211,7 +211,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     }
 
     @ReactMethod
-    public void stopSPA(Promise promise) {
+    public void cancelSPA(Promise promise) {
         Intent intent = new Intent("com.clover.remote.terminal.securepay.action.V1_BREAK");
         Activity currentActivity = getCurrentActivity();
         if (currentActivity != null) {
