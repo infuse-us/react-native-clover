@@ -1,4 +1,4 @@
-package com.infuse.cloversdkreactnativebridge;
+package com.infuse.cloversdkreactnativebridge.payments;
 
 import android.app.Activity;
 import android.content.Intent;

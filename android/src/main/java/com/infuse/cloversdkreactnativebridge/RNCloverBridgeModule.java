@@ -20,8 +20,6 @@ import com.clover.sdk.util.CustomerMode;
 import com.clover.sdk.v1.Intents;
 import com.clover.sdk.v1.ServiceConnector;
 import com.clover.sdk.v1.merchant.MerchantConnector;
-import com.clover.sdk.v3.connector.ExternalIdUtils;
-import com.clover.sdk.v3.remotepay.SaleRequest;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -31,6 +29,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.infuse.cloversdkreactnativebridge.payments.ExternalSecurePaymentTask;
+import com.infuse.cloversdkreactnativebridge.payments.ReactPaymentConnector;
 
 import java.net.NetworkInterface;
 import java.util.Collections;
@@ -49,6 +49,8 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     private Account account;
     private MerchantConnector merchantConnector;
+    private PaymentConnector paymentConnector;
+    private ReactPaymentConnector mPaymentConnector;
 
     private Promise accountPromise;
     private Promise paymentPromise;
@@ -57,6 +59,9 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         super(reactContext);
         mContext = reactContext;
         reactContext.addActivityEventListener(mActivityEventListener);
+
+        startAccountChooser();
+        mPaymentConnector = new ReactPaymentConnector(mContext, account);
     }
 
     @Override
@@ -123,8 +128,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         WindowManager windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
 
-        int widthInDP = Math.round(displayMetrics.widthPixels / displayMetrics.density);
-        return widthInDP;
+        return Math.round(displayMetrics.widthPixels / displayMetrics.density);
     }
 
     @ReactMethod
@@ -192,15 +196,27 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     }
 
     @ReactMethod
-    public void startSecurePayment(ReadableMap options, Promise promise) {
-        Account account = CloverAccount.getAccount(mContext);
-        PaymentConnector paymentConnector = new PaymentConnector(getCurrentActivity().getApplicationContext(), account, new ReactPaymentConnectorListener(promise));
-        int amount = options.getInt("amount");
-        SaleRequest saleRequest = new SaleRequest();
-        saleRequest.setAmount((long) amount);
-        saleRequest.setExternalId(ExternalIdUtils.generateNewID());
+    public void startPayment(ReadableMap options, Promise promise) {
+        mPaymentConnector.sale(options, promise);
+    }
 
-        paymentConnector.sale(saleRequest);
+    @ReactMethod
+    public void startManualRefund(ReadableMap options, Promise promise) {
+        mPaymentConnector.manualRefund(options, promise);
+    }
+
+    @ReactMethod
+    public void startPaymentRefund(ReadableMap options, Promise promise) {
+        mPaymentConnector.refundPayment(options, promise);
+    }
+
+    @ReactMethod
+    public void cancelSPA(Promise promise) {
+        Intent intent = new Intent("com.clover.remote.terminal.securepay.action.V1_BREAK");
+        Activity currentActivity = getCurrentActivity();
+        if (currentActivity != null) {
+            currentActivity.sendBroadcast(intent);
+        }
     }
 
     @ReactMethod
