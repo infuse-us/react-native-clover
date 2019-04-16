@@ -1,9 +1,11 @@
-package com.infuse.cloversdkreactnativebridge;
+package com.infuse.cloversdkreactnativebridge.payments;
 
 import android.util.Log;
 
 import com.clover.sdk.v3.connector.IPaymentConnectorListener;
+import com.clover.sdk.v3.payments.Credit;
 import com.clover.sdk.v3.payments.Payment;
+import com.clover.sdk.v3.payments.Refund;
 import com.clover.sdk.v3.remotepay.AuthResponse;
 import com.clover.sdk.v3.remotepay.CapturePreAuthResponse;
 import com.clover.sdk.v3.remotepay.CloseoutResponse;
@@ -22,15 +24,14 @@ import com.clover.sdk.v3.remotepay.VerifySignatureRequest;
 import com.clover.sdk.v3.remotepay.VoidPaymentRefundResponse;
 import com.clover.sdk.v3.remotepay.VoidPaymentResponse;
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 
 public class ReactPaymentConnectorListener implements IPaymentConnectorListener {
 
-    private Promise mPromise;
+    private ReactPaymentListener mReactPaymentListener;
 
-    ReactPaymentConnectorListener(Promise promise) {
-        mPromise = promise;
+    public ReactPaymentConnectorListener(ReactPaymentListener reactPaymentListener) {
+        mReactPaymentListener = reactPaymentListener;
     }
 
     @Override
@@ -71,24 +72,46 @@ public class ReactPaymentConnectorListener implements IPaymentConnectorListener 
             Payment payment = response.getPayment();
             map.putBoolean("success", response.getSuccess());
             map.putString("paymentId", payment.getId());
+            map.putString("orderId", payment.getOrder().getId());
             map.putString("externalPaymentId", payment.getExternalPaymentId());
-            map.putString("externalReferenceId", payment.getExternalReferenceId());
         } else {
             map.putBoolean("success", response.getSuccess());
             map.putString("reason", response.getReason());
             map.putString("message", response.getMessage());
         }
-        mPromise.resolve(map);
+        mReactPaymentListener.onPaymentConnectorEvent(map);
     }
 
     @Override
     public void onManualRefundResponse(ManualRefundResponse response) {
         Log.d("ReactPaymentConnector", "onManualRefundResponse");
+        WritableMap map = Arguments.createMap();
+        boolean success = response.getSuccess();
+        map.putBoolean("success", success);
+        if (success) {
+            Credit credit = response.getCredit();
+            map.putString("refundId", credit.getId());
+        } else {
+            map.putString("reason", response.getReason());
+            map.putString("message", response.getMessage());
+        }
+        mReactPaymentListener.onPaymentConnectorEvent(map);
     }
 
     @Override
     public void onRefundPaymentResponse(RefundPaymentResponse response) {
         Log.d("ReactPaymentConnector", "onRefundPaymentResponse");
+        WritableMap map = Arguments.createMap();
+        boolean success = response.getSuccess();
+        map.putBoolean("success", success);
+        if (success) {
+            Refund refund = response.getRefund();
+            map.putString("refundId", refund.getId());
+        } else {
+            map.putString("reason", response.getReason());
+            map.putString("message", response.getMessage());
+        }
+        mReactPaymentListener.onPaymentConnectorEvent(map);
     }
 
     @Override

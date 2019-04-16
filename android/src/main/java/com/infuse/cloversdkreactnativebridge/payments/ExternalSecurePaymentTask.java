@@ -1,4 +1,4 @@
-package com.infuse.cloversdkreactnativebridge;
+package com.infuse.cloversdkreactnativebridge.payments;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -49,6 +49,7 @@ public class ExternalSecurePaymentTask extends AsyncTask<Void, Void, Intent> {
     protected void onPostExecute(Intent payIntent) {
         super.onPostExecute(payIntent);
         currentActivity.startActivityForResult(payIntent, SECURE_PAY_REQUEST);
+
     }
 
     private Intent createExternalSecurePayIntent(long amount, int cardEntryFlag, String externalService) {
