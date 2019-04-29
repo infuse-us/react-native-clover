@@ -18,8 +18,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 10000001
-        versionName "1.0.0"
+        versionCode 10010001
+        versionName "1.0.1"
     }
     lintOptions {
         abortOnError false
@@ -29,6 +29,7 @@ android {
 repositories {
     mavenCentral()
     google()
+    jcenter()
 }
 
 dependencies {
