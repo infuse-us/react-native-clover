@@ -7,6 +7,8 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
@@ -14,7 +16,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
-import com.clover.connector.sdk.v3.PaymentConnector;
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.util.CustomerMode;
 import com.clover.sdk.v1.Intents;
@@ -49,7 +50,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     private Account account;
     private MerchantConnector merchantConnector;
-    private PaymentConnector paymentConnector;
     private ReactPaymentConnector mPaymentConnector;
 
     private Promise accountPromise;
@@ -84,6 +84,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
         constants.put("isFlex", isFlex());
         constants.put("isMini", isMini());
+        constants.put("getSpaVersion", getSpaVersion());
 
         return constants;
     }
@@ -96,11 +97,11 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     }
 
     @ReactMethod
-    public void enableCustomerMode() { CustomerMode.enable(this.mContext); }
+    public void enableCustomerMode() { CustomerMode.enable(getCurrentActivity()); }
 
     @ReactMethod
     public void disableCustomerMode() {
-        CustomerMode.disable(this.mContext, false);
+        CustomerMode.disable(getCurrentActivity(), false);
     }
 
     @ReactMethod
@@ -112,6 +113,17 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         } else {
             Log.d(TAG, "No merchantConnector");
             promise.resolve(null);
+        }
+    }
+
+    private String getSpaVersion() {
+        try {
+            PackageManager pManager = mContext.getPackageManager();
+            PackageInfo pInfo = pManager.getPackageInfo("com.clover.payment.executor.secure", 0);
+            return pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return "N/A";
         }
     }
 
