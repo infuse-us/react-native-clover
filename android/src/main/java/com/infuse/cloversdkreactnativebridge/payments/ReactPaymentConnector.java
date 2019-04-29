@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.content.Context;
 
 import com.clover.connector.sdk.v3.PaymentConnector;
+import com.clover.sdk.v3.connector.ExternalIdUtils;
 import com.clover.sdk.v3.remotepay.ManualRefundRequest;
 import com.clover.sdk.v3.remotepay.RefundPaymentRequest;
 import com.clover.sdk.v3.remotepay.SaleRequest;
@@ -32,9 +33,14 @@ public class ReactPaymentConnector {
             promise.reject("error", "Missing amount");
         } else {
             int amount = options.getInt("amount");
+            String id = ExternalIdUtils.generateNewID();
+            if (options.hasKey("paymentId")) {
+                id = options.getString("paymentId");
+            }
 
             SaleRequest saleRequest = new SaleRequest();
             saleRequest.setAmount((long) amount);
+            saleRequest.setExternalId(id);
 
             paymentConnector.sale(saleRequest);
         }
