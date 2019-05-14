@@ -7,11 +7,13 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -276,6 +278,14 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         } else {
             audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
         }
+    }
+
+    @ReactMethod
+    public void isPlugged(Promise promise) {
+        Intent intent = mContext.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int extra = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+        Boolean plugged = extra == BatteryManager.BATTERY_PLUGGED_AC || extra == BatteryManager.BATTERY_PLUGGED_USB || extra == BatteryManager.BATTERY_PLUGGED_WIRELESS;
+        promise.resolve(plugged);
     }
 
     private void startAccountChooser() {
