@@ -12,9 +12,9 @@ import com.facebook.react.bridge.WritableMap;
 
 public class MerchantCallbackTask extends MerchantConnector.MerchantCallback<Merchant> {
     private static final String TAG = "RNCloverBridge";
-    Promise promise;
+    private Promise promise;
 
-    public MerchantCallbackTask(Promise promise) {
+    MerchantCallbackTask(Promise promise) {
         this.promise = promise;
     }
 
@@ -28,7 +28,7 @@ public class MerchantCallbackTask extends MerchantConnector.MerchantCallback<Mer
         map.putString("email", result.getSupportEmail());
         map.putMap("location", this.mapLocation(mAddress));
 
-        promise.resolve(map);
+        sendResponse(true, map, null);
     }
 
     @Override
@@ -36,13 +36,13 @@ public class MerchantCallbackTask extends MerchantConnector.MerchantCallback<Mer
         Log.d(TAG, "onServiceFailure");
         Log.d(TAG, String.valueOf(status.getStatusCode()));
         Log.d(TAG, status.getStatusMessage());
-        promise.resolve(null);
+        sendResponse(false, null, status.getStatusMessage());
     }
 
     @Override
     public void onServiceConnectionFailure() {
         Log.d(TAG, "onServiceConnectionFailure");
-        promise.resolve(null);
+        sendResponse(false, null, null);
     }
 
     private WritableMap mapLocation(MerchantAddress address) {
@@ -52,5 +52,15 @@ public class MerchantCallbackTask extends MerchantConnector.MerchantCallback<Mer
         map.putString("city", address.getCity());
         map.putString("region", address.getState());
         return map;
+    }
+
+    private void sendResponse(boolean success, WritableMap data, String statusMessage) {
+        WritableMap map = Arguments.createMap();
+
+        map.putBoolean("success", success);
+        if (!success) map.putString("statusMessage", statusMessage);
+        map.putMap("data", data);
+
+        promise.resolve(map);
     }
 }
