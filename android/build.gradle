@@ -18,11 +18,20 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 10010101
-        versionName "1.0.1"
+        versionCode 20010000
+        versionName "2.1.0"
     }
     lintOptions {
         abortOnError false
+    }
+
+    buildTypes {
+        release {
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+        releaseStaging {
+            initWith release
+        }
     }
 }
 
