@@ -1,4 +1,4 @@
-package com.infuse.cloversdkreactnativebridge;
+package com.infuse.clover.bridge;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;

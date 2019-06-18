@@ -1,17 +1,41 @@
 {
-  "name": "clover-sdk-react-native-bridge",
-  "version": "2.1.0",
-  "description": "",
+  "name": "@infuse/react-native-clover",
+  "title": "React Native Clover",
+  "version": "0.0.1",
+  "description": "React Native native module for Clover SDK",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/infuse-team/react-native-clover.git",
+    "baseUrl": "https://bitbucket.org/infuse-team/react-native-clover"
+  },
+  "author": {
+    "name": "Xing Tong",
+    "email": "xing@infuse.us"
+  },
+  "keywords": [
+    "react-native",
+    "clover"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [
-    "react-native"
-  ],
-  "author": "",
-  "license": "",
+  "private": true,
+  "license": "MIT",
   "peerDependencies": {
-    "react-native": ">=0.58.0 <=0.59.x"
+    "react": "^16.8.3",
+    "react-native": "^0.59.4"
+  },
+  "devDependencies": {
+    "@infuse/eslint-config": "^1.3.0",
+    "@react-native-community/eslint-config": "^0.0.5",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-jest": "^22.6.4",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.13.0",
+    "typescript": "^3.5.2"
   }
 }

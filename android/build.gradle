@@ -18,8 +18,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 20010000
-        versionName "2.1.0"
+        versionCode 1
+        versionName "0.0.1"
     }
     lintOptions {
         abortOnError false
@@ -42,7 +42,6 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.aar"])
     implementation 'com.facebook.react:react-native:+'
     implementation 'com.clover.sdk:clover-android-sdk:latest.release'
     implementation 'com.clover.sdk:clover-android-connector-sdk:latest.release'

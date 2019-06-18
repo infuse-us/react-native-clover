@@ -1,4 +1,4 @@
-package com.infuse.cloversdkreactnativebridge.payments;
+package com.infuse.clover.bridge.payments;
 
 import com.facebook.react.bridge.WritableMap;
 

@@ -1,4 +1,4 @@
-package com.infuse.cloversdkreactnativebridge;
+package com.infuse.clover.bridge;
 
 import android.util.Log;
 
@@ -11,7 +11,6 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 
 public class MerchantCallbackTask extends MerchantConnector.MerchantCallback<Merchant> {
-    private static final String TAG = "RNCloverBridge";
     private Promise promise;
 
     MerchantCallbackTask(Promise promise) {
@@ -33,15 +32,15 @@ public class MerchantCallbackTask extends MerchantConnector.MerchantCallback<Mer
 
     @Override
     public void onServiceFailure(ResultStatus status) {
-        Log.d(TAG, "onServiceFailure");
-        Log.d(TAG, String.valueOf(status.getStatusCode()));
-        Log.d(TAG, status.getStatusMessage());
+        Log.d(RNCloverBridgeModule.TAG, "onServiceFailure");
+        Log.d(RNCloverBridgeModule.TAG, String.valueOf(status.getStatusCode()));
+        Log.d(RNCloverBridgeModule.TAG, status.getStatusMessage());
         sendResponse(false, null, status.getStatusMessage());
     }
 
     @Override
     public void onServiceConnectionFailure() {
-        Log.d(TAG, "onServiceConnectionFailure");
+        Log.d(RNCloverBridgeModule.TAG, "onServiceConnectionFailure");
         sendResponse(false, null, null);
     }
 

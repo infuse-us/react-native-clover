@@ -1,0 +1,15 @@
+{
+  "settings": {
+    "react": {
+      "version": "999.999.999"
+    }
+  },
+  "extends": [
+    "eslint:recommended",
+    "@infuse/eslint-config/react-native"
+  ],
+  "rules": {
+    "prettier/prettier": [2, 'fb', '@format'],
+    "import/no-unresolved": [2, { "ignore": ["^react$", "^react-native$"]}]
+  }
+}

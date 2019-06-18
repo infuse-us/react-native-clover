@@ -1,14 +1,14 @@
-package com.infuse.cloversdkreactnativebridge;
+package com.infuse.clover.bridge;
 
+import android.accounts.Account;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.accounts.Account;
 
 import com.clover.sdk.v1.printer.Printer;
 import com.clover.sdk.v1.printer.PrinterConnector;
-import android.app.Activity;
 import com.clover.sdk.v1.printer.job.ImagePrintJob;
 import com.clover.sdk.v1.printer.job.PrintJob;
 import com.clover.sdk.v1.printer.job.PrintJobsConnector;
@@ -18,9 +18,7 @@ import com.facebook.react.bridge.Promise;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PrinterWrapper {
 
