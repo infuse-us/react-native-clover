@@ -1,11 +1,19 @@
 # Changelog
 
+## [0.0.2](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.2%0Dv0.0.1) - (2019-06-18)
+
+### Removed
+- Remove unneeded android permissions from the manifest.
+
+### Fixed
+- Fix styling in Changelog.
+
 ## [0.0.1](https://bitbucket.org/infuse-team/react-native-clover/commits/tag/v0.0.1) - (2019-06-18)
 This is the initial versioned/tracked release of `@infuse/react-native-clover` as part of our initiative to create a shared/reusable React Native native module for the Clover SDK.
 
 ### Added
-  - Add a Changelog.
-  - Add [@infuse/eslint-config](https://bitbucket.org/infuse-team/eslint-config-infuse/src/master/) and create a .eslintrc.
+- Add a Changelog.
+- Add [@infuse/eslint-config](https://bitbucket.org/infuse-team/eslint-config-infuse/src/master/) and create a .eslintrc.
 
 ### Changed
 - Rename repo from `clover-sdk-react-native-bridge` to `react-native-clover`. Also update Android code and JS code to reflect this change.
