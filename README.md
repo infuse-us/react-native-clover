@@ -1,5 +1,5 @@
 
-# `@infuse/react-native-clover`
+# \@infuse/react-native-clover
 
 React Native native module for the [Clover SDK](https://github.com/clover/clover-android-sdk).
 
