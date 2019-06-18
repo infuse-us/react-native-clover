@@ -1,11 +1,11 @@
 
-# \@infuse/react-native-clover
+# @​infuse/react-native-clover
 
 React Native native module for the [Clover SDK](https://github.com/clover/clover-android-sdk).
 
 ## Getting started
 
-`$ yarn add https://bitbucket.cardconnect.com/scm/clov/clover-sdk-react-native-bridge.git`
+`$ yarn add https://bitbucket.org/infuse-team/react-native-clover.git`
 
 ### Mostly automatic installation
 
