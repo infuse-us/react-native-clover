@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.0.3] - (2019-07-16)
+
+### Added
+- Add a typing definition file.
+- Add a .prettierrc file.
+- Add maps `DATA_ENTRY_LOCATION` and `VOID_REASON` to constants.
+- Add in additional payment methods (`VoidPayment`, `VoidPaymentRefund`).
+
+### Changed
+- *Breaking* Add new method `initializePaymentConnector` that must be called with a RAID before the payment methods can be called.
+- *Breaking* Rename payment methods to standardize with what the Clover paymentConnector already calls them.
+- Rename payment package classes and methods. Add a new `Payments` class to hold various static constants and methods.
+- Clean up and refactor payment methods.
+- Add validation checks to the payment method's option parameter.
+- Update gradle tool and gradle wrapper versions to match RN ~0.60.
+- Update react-native peerDependecies to support react-native@^0.60.
+- Update Readme to match changes.
+
 ## [0.0.2](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.2%0Dv0.0.1) - (2019-06-18)
 
 ### Removed
