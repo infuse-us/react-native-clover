@@ -17,6 +17,8 @@ import com.clover.sdk.util.CustomerMode;
 import com.clover.sdk.v1.Intents;
 import com.clover.sdk.v1.ServiceConnector;
 import com.clover.sdk.v1.merchant.MerchantConnector;
+import com.clover.sdk.v3.order.VoidReason;
+import com.clover.sdk.v3.payments.DataEntryLocation;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -25,7 +27,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.infuse.clover.bridge.payments.ReactPaymentConnector;
+import com.infuse.clover.bridge.payments.BridgePaymentConnector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +43,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     private Account account;
     private MerchantConnector merchantConnector;
-    private ReactPaymentConnector mPaymentConnector;
+    private BridgePaymentConnector bridgePaymentConnector;
 
     private Promise accountPromise;
 
@@ -49,9 +51,8 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         super(reactContext);
         mContext = reactContext;
         reactContext.addActivityEventListener(activityEventListener);
-
-        startAccountChooser();
-        mPaymentConnector = new ReactPaymentConnector(mContext, account);
+//        startAccountChooser();
+//        bridgePaymentConnector = new BridgePaymentConnector(mContext, account);
     }
 
     @Override
@@ -63,15 +64,36 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     public Map<String, Object> getConstants() {
         final Map<String, Object> constants = new HashMap<>();
 
+        // Expose card entry methods
         WritableMap cardEntryMethods = Arguments.createMap();
         cardEntryMethods.putInt("ICC_CONTACT", Intents.CARD_ENTRY_METHOD_ICC_CONTACT);
         cardEntryMethods.putInt("MAG_STRIPE", Intents.CARD_ENTRY_METHOD_MAG_STRIPE);
         cardEntryMethods.putInt("MANUAL", Intents.CARD_ENTRY_METHOD_MANUAL);
         cardEntryMethods.putInt("NFC_CONTACTLESS", Intents.CARD_ENTRY_METHOD_NFC_CONTACTLESS);
         cardEntryMethods.putInt("VAULTED_CARD", Intents.CARD_ENTRY_METHOD_VAULTED_CARD);
-
+        cardEntryMethods.putInt("ALL", Intents.CARD_ENTRY_METHOD_ALL);
         constants.put("CARD_ENTRY_METHOD", cardEntryMethods);
 
+        // Expose DataEntryLocation Enum
+        // https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/DataEntryLocation.html
+        WritableMap dataEntryLocations = Arguments.createMap();
+        for (DataEntryLocation dataEntryLocation : DataEntryLocation.values()) {
+            dataEntryLocations.putString(dataEntryLocation.name(), dataEntryLocation.name());
+        }
+//        dataEntryLocations.putString("ON_PAPER", DataEntryLocation.ON_PAPER.name());
+//        dataEntryLocations.putString("ON_SCREEN", DataEntryLocation.ON_SCREEN.name());
+//        dataEntryLocations.putString("NONE", DataEntryLocation.NONE.name());
+        constants.put("DATA_ENTRY_LOCATION", dataEntryLocations);
+
+        // Expose VoidReason Enum
+        // https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/order/VoidReason.html
+        WritableMap voidReasons = Arguments.createMap();
+        for (VoidReason voidReason : VoidReason.values()) {
+            voidReasons.putString(voidReason.name(), voidReason.name());
+        }
+        constants.put("VOID_REASON", voidReasons);
+
+        // Expose misc constants
         constants.put("isFlex", isFlex());
         constants.put("isMini", isMini());
         constants.put("getSpaVersion", getSpaVersion());
@@ -134,18 +156,34 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     }
 
     @ReactMethod
-    public void startPayment(ReadableMap options, Promise promise) {
-        mPaymentConnector.sale(options, promise);
+    public void initializePaymentConnector(String raid) {
+        startAccountChooser();
+        bridgePaymentConnector = new BridgePaymentConnector(mContext, account, raid);
     }
 
     @ReactMethod
-    public void startManualRefund(ReadableMap options, Promise promise) {
-        mPaymentConnector.manualRefund(options, promise);
+    public void sale(ReadableMap options, Promise promise) {
+        bridgePaymentConnector.sale(options, promise);
     }
 
     @ReactMethod
-    public void startPaymentRefund(ReadableMap options, Promise promise) {
-        mPaymentConnector.refundPayment(options, promise);
+    public void manualRefund(ReadableMap options, Promise promise) {
+        bridgePaymentConnector.manualRefund(options, promise);
+    }
+
+    @ReactMethod
+    public void refundPayment(ReadableMap options, Promise promise) {
+        bridgePaymentConnector.refundPayment(options, promise);
+    }
+
+    @ReactMethod
+    public void voidPayment(ReadableMap options, Promise promise) {
+        bridgePaymentConnector.voidPayment(options, promise);
+    }
+
+    @ReactMethod
+    public void voidPaymentRefund(ReadableMap options, Promise promise) {
+        bridgePaymentConnector.voidPaymentRefund(options, promise);
     }
 
     @ReactMethod
