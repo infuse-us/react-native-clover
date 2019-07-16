@@ -3,9 +3,6 @@ package com.infuse.clover.bridge.payments;
 import android.util.Log;
 
 import com.clover.sdk.v3.connector.IPaymentConnectorListener;
-import com.clover.sdk.v3.payments.Credit;
-import com.clover.sdk.v3.payments.Payment;
-import com.clover.sdk.v3.payments.Refund;
 import com.clover.sdk.v3.remotepay.AuthResponse;
 import com.clover.sdk.v3.remotepay.CapturePreAuthResponse;
 import com.clover.sdk.v3.remotepay.CloseoutResponse;
@@ -26,141 +23,161 @@ import com.clover.sdk.v3.remotepay.VoidPaymentResponse;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 
-public class ReactPaymentConnectorListener implements IPaymentConnectorListener {
+public class PaymentConnectorListener implements IPaymentConnectorListener {
 
-    private ReactPaymentListener mReactPaymentListener;
+    private final String TAG = "RNCloverBridge";
+    private BridgePaymentConnectorListener mBridgePaymentConnectorListener;
 
-    public ReactPaymentConnectorListener(ReactPaymentListener reactPaymentListener) {
-        mReactPaymentListener = reactPaymentListener;
+    PaymentConnectorListener(BridgePaymentConnectorListener bridgePaymentConnectorListener) {
+        mBridgePaymentConnectorListener = bridgePaymentConnectorListener;
     }
 
     @Override
     public void onPreAuthResponse(PreAuthResponse response) {
-        Log.d("ReactPaymentConnector", "onPreAuthResponse");
+        Log.d(TAG, "onPreAuthResponse");
     }
 
     @Override
     public void onAuthResponse(AuthResponse response) {
-        Log.d("ReactPaymentConnector", "onAuthResponse");
+        Log.d(TAG, "onAuthResponse");
     }
 
     @Override
     public void onTipAdjustAuthResponse(TipAdjustAuthResponse response) {
-        Log.d("ReactPaymentConnector", "onTipAdjustAuthResponse");
+        Log.d(TAG, "onTipAdjustAuthResponse");
     }
 
     @Override
     public void onCapturePreAuthResponse(CapturePreAuthResponse response) {
-        Log.d("ReactPaymentConnector", "onCapturePreAuthResponse");
+        Log.d(TAG, "onCapturePreAuthResponse");
     }
 
     @Override
     public void onVerifySignatureRequest(VerifySignatureRequest request) {
-        Log.d("ReactPaymentConnector", "onVerifySignatureRequest");
+        Log.d(TAG, "onVerifySignatureRequest");
     }
 
     @Override
     public void onConfirmPaymentRequest(ConfirmPaymentRequest request) {
-        Log.d("ReactPaymentConnector", "onConfirmPaymentRequest");
+        Log.d(TAG, "onConfirmPaymentRequest");
     }
 
     @Override
     public void onSaleResponse(SaleResponse response) {
-        Log.d("ReactPaymentConnector", "onSaleResponse");
+        Log.d(TAG, "onSaleResponse");
         WritableMap map = Arguments.createMap();
-        if (response.getSuccess()) {
-            Payment payment = response.getPayment();
-            map.putBoolean("success", response.getSuccess());
-            map.putString("paymentId", payment.getId());
-            map.putString("orderId", payment.getOrder().getId());
-            map.putString("externalPaymentId", payment.getExternalPaymentId());
+        boolean success = response.getSuccess();
+        map.putBoolean("success", success);
+        if (success) {
+            map.putMap("payment", Payments.mapPayment(response.getPayment()));
         } else {
-            map.putBoolean("success", response.getSuccess());
             map.putString("reason", response.getReason());
             map.putString("message", response.getMessage());
         }
-        mReactPaymentListener.onPaymentConnectorEvent(map);
+        mBridgePaymentConnectorListener.onPaymentConnectorEvent(map);
     }
 
     @Override
     public void onManualRefundResponse(ManualRefundResponse response) {
-        Log.d("ReactPaymentConnector", "onManualRefundResponse");
+        Log.d(TAG, "onManualRefundResponse");
         WritableMap map = Arguments.createMap();
         boolean success = response.getSuccess();
         map.putBoolean("success", success);
         if (success) {
-            Credit credit = response.getCredit();
-            map.putString("refundId", credit.getId());
+            map.putMap("credit", Payments.mapCredit(response.getCredit()));
         } else {
             map.putString("reason", response.getReason());
             map.putString("message", response.getMessage());
         }
-        mReactPaymentListener.onPaymentConnectorEvent(map);
+        mBridgePaymentConnectorListener.onPaymentConnectorEvent(map);
     }
 
     @Override
     public void onRefundPaymentResponse(RefundPaymentResponse response) {
-        Log.d("ReactPaymentConnector", "onRefundPaymentResponse");
+        Log.d(TAG, "onRefundPaymentResponse");
         WritableMap map = Arguments.createMap();
         boolean success = response.getSuccess();
         map.putBoolean("success", success);
         if (success) {
-            Refund refund = response.getRefund();
-            map.putString("refundId", refund.getId());
+            // response.orderId seems to be null
+            // response.paymentId seems to be null
+            map.putMap("refund", Payments.mapRefund(response.getRefund()));
         } else {
             map.putString("reason", response.getReason());
             map.putString("message", response.getMessage());
         }
-        mReactPaymentListener.onPaymentConnectorEvent(map);
+        mBridgePaymentConnectorListener.onPaymentConnectorEvent(map);
     }
 
     @Override
     public void onTipAdded(TipAdded tipAdded) {
-        Log.d("ReactPaymentConnector", "onTipAdded");
+        Log.d(TAG, "onTipAdded");
     }
 
     @Override
     public void onVoidPaymentResponse(VoidPaymentResponse response) {
-        Log.d("ReactPaymentConnector", "onVoidPaymentResponse");
+        Log.d(TAG, "onVoidPaymentResponse");
+        WritableMap map = Arguments.createMap();
+        boolean success = response.getSuccess();
+        map.putBoolean("success", success);
+        if (success) {
+            String paymentId = response.getPaymentId();
+            map.putString("paymentId", paymentId);
+        } else {
+            map.putString("reason", response.getReason());
+            map.putString("message", response.getMessage());
+        }
+        mBridgePaymentConnectorListener.onPaymentConnectorEvent(map);
     }
 
     @Override
     public void onVaultCardResponse(VaultCardResponse response) {
-        Log.d("ReactPaymentConnector", "onVaultCardResponse");
+        Log.d(TAG, "onVaultCardResponse");
     }
 
     @Override
     public void onRetrievePendingPaymentsResponse(RetrievePendingPaymentsResponse retrievePendingPaymentResponse) {
-        Log.d("ReactPaymentConnector", "onRetrievePendingPaymentResponse");
+        Log.d(TAG, "onRetrievePendingPaymentResponse");
     }
 
     @Override
     public void onReadCardDataResponse(ReadCardDataResponse response) {
-        Log.d("ReactPaymentConnector", "onReadCardDataResponse");
+        Log.d(TAG, "onReadCardDataResponse");
     }
 
     @Override
     public void onCloseoutResponse(CloseoutResponse response) {
-        Log.d("ReactPaymentConnector", "onCloseoutResponse");
+        Log.d(TAG, "onCloseoutResponse");
     }
 
     @Override
     public void onRetrievePaymentResponse(RetrievePaymentResponse response) {
-        Log.d("ReactPaymentConnector", "onRetrievePaymentResponse");
+        Log.d(TAG, "onRetrievePaymentResponse");
     }
 
     @Override
     public void onVoidPaymentRefundResponse(VoidPaymentRefundResponse response) {
-        Log.d("ReactPaymentConnector", "onVoidPaymentRefundResponse");
+        Log.d(TAG, "onVoidPaymentRefundResponse");
+        WritableMap map = Arguments.createMap();
+        boolean success = response.getSuccess();
+        map.putBoolean("success", success);
+        if (success) {
+            map.putString("paymentId", response.getPaymentId());
+            map.putString("refundId", response.getRefundId());
+        } else {
+            map.putString("reason", response.getReason());
+            map.putString("message", response.getMessage());
+        }
+        mBridgePaymentConnectorListener.onPaymentConnectorEvent(map);
     }
 
     @Override
     public void onDeviceDisconnected() {
-        Log.d("ReactPaymentConnector", "onDeviceDisconnected");
+        Log.d(TAG, "onDeviceDisconnected");
     }
 
     @Override
     public void onDeviceConnected() {
-        Log.d("ReactPaymentConnector", "onDeviceConnected");
+        Log.d(TAG, "onDeviceConnected");
     }
 }
