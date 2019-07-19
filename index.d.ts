@@ -4,6 +4,9 @@ interface ObjectRef {
 
 interface Result {
   success: boolean;
+}
+
+interface TransactionResult extends Result {
   reason?: string;
   message?: string;
 }
@@ -72,7 +75,7 @@ interface SaleOption {
   signatureThreshold? : number;
 }
 
-interface SaleResult extends Result {
+interface SaleResult extends TransactionResult {
   payment: Payment;
 }
 
@@ -82,7 +85,7 @@ interface RefundOption {
   amount?: number;
 }
 
-interface RefundResult extends Result {
+interface RefundResult extends TransactionResult {
   refund: Refund;
 }
 
@@ -94,7 +97,7 @@ interface ManualRefundOption {
   disableRestartTransactionOnFail?: boolean;
 }
 
-interface ManualRefundResult extends Result {
+interface ManualRefundResult extends TransactionResult {
   credit: Credit;
 }
 
@@ -104,7 +107,7 @@ interface VoidPaymentOption {
   voidReason: string;
 }
 
-interface VoidPaymentResult extends Result {
+interface VoidPaymentResult extends TransactionResult {
   paymentId: string;
 }
 
@@ -122,7 +125,7 @@ declare const _default: {
   disableCustomerMode: () => void;
   getMerchant: () => Promise<object>;
   print: (imagePath: string) => Promise<object>;
-  startAccountChooserIfNeeded: () => Promise<object>;
+  startAccountChooserIfNeeded: () => Promise<Result>;
 
   // Misc Methods
   isFlex: () => boolean;
