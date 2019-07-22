@@ -127,12 +127,12 @@ Clover.voidPayment(option).then(result =>{});
 ## Contants
 
 * `CARD_ENTRY_METHODS`
-  * `MAG_STRIPE`
-  * `ICC_CONTACT`
-  * `NFC_CONTACTLESS`
-  * `VAULTED_CARD`
-  * `MANUAL`
-  * `ALL`
+    * `MAG_STRIPE`
+    * `ICC_CONTACT`
+    * `NFC_CONTACTLESS`
+    * `VAULTED_CARD`
+    * `MANUAL`
+    * `ALL`
 * [DATA_ENTRY_LOCATION](https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/DataEntryLocation.html)
 * [VOID_REASON](https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/order/VoidReason.html)
   
