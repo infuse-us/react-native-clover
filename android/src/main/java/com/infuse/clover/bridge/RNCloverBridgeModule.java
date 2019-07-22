@@ -51,8 +51,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         super(reactContext);
         mContext = reactContext;
         reactContext.addActivityEventListener(activityEventListener);
-//        startAccountChooser();
-//        bridgePaymentConnector = new BridgePaymentConnector(mContext, account);
     }
 
     @Override
@@ -80,9 +78,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         for (DataEntryLocation dataEntryLocation : DataEntryLocation.values()) {
             dataEntryLocations.putString(dataEntryLocation.name(), dataEntryLocation.name());
         }
-//        dataEntryLocations.putString("ON_PAPER", DataEntryLocation.ON_PAPER.name());
-//        dataEntryLocations.putString("ON_SCREEN", DataEntryLocation.ON_SCREEN.name());
-//        dataEntryLocations.putString("NONE", DataEntryLocation.NONE.name());
         constants.put("DATA_ENTRY_LOCATION", dataEntryLocations);
 
         // Expose VoidReason Enum
@@ -163,27 +158,47 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     @ReactMethod
     public void sale(ReadableMap options, Promise promise) {
-        bridgePaymentConnector.sale(options, promise);
+        if (bridgePaymentConnector != null) {
+            bridgePaymentConnector.sale(options, promise);
+        } else {
+            paymentConnectorReject(promise);
+        }
     }
 
     @ReactMethod
     public void manualRefund(ReadableMap options, Promise promise) {
-        bridgePaymentConnector.manualRefund(options, promise);
+        if (bridgePaymentConnector != null) {
+            bridgePaymentConnector.manualRefund(options, promise);
+        } else {
+            paymentConnectorReject(promise);
+        }
     }
 
     @ReactMethod
     public void refundPayment(ReadableMap options, Promise promise) {
-        bridgePaymentConnector.refundPayment(options, promise);
+        if (bridgePaymentConnector != null) {
+            bridgePaymentConnector.refundPayment(options, promise);
+        } else {
+            paymentConnectorReject(promise);
+        }
     }
 
     @ReactMethod
     public void voidPayment(ReadableMap options, Promise promise) {
-        bridgePaymentConnector.voidPayment(options, promise);
+        if (bridgePaymentConnector != null) {
+            bridgePaymentConnector.voidPayment(options, promise);
+        } else {
+            paymentConnectorReject(promise);
+        }
     }
 
     @ReactMethod
     public void voidPaymentRefund(ReadableMap options, Promise promise) {
-        bridgePaymentConnector.voidPaymentRefund(options, promise);
+        if (bridgePaymentConnector != null) {
+            bridgePaymentConnector.voidPaymentRefund(options, promise);
+        } else {
+            paymentConnectorReject(promise);
+        }
     }
 
     @ReactMethod
@@ -234,6 +249,10 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
             merchantConnector.disconnect();
             merchantConnector = null;
         }
+    }
+
+    private void paymentConnectorReject(Promise promise) {
+        promise.reject("error", "PaymentConnector not initialized.");
     }
 
     @Override

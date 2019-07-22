@@ -7,13 +7,11 @@ React Native native module for the [Clover SDK](https://github.com/clover/clover
 
 `$ yarn add https://bitbucket.org/infuse-team/react-native-clover.git`
 
-### Mostly automatic installation
+### Mostly automatic installation (Pre-0.60)
 
 `$ react-native link @infuse/react-native-clover`
 
-### Manual installation
-
-
+### Manual installation (Pre-0.60)
 
 #### Android
 
@@ -49,16 +47,94 @@ Clover.isFlex();
 Clover.isMini();
 Clover.getSpaVersion();
 
+// This should be called as early as possible during app load before calling any payment method
+Clover.initializePaymentConnector(String raid);
+
+/**
+ * Sale Option
+ *  
+ * amount: int - Required
+ * externalPaymentId: string - Required, unless generateExternalPaymentId is true
+ * generateExternalPaymentId: bool - optional, unless externalPaymentId is not provided, default false
+ * cardEntryMethods: int - optional, see CARD_ENTRY_METHODS, defaults to MAG_STRIPE | ICC_CONTACT | NFC_CONTACTLESS
+ * disableDuplicateChecking: bool -  optional, default false
+ * disableRestartTransactionOnFail: bool - optional, default false
+ * disablePrinting: bool - optional, default false
+ * disableReceiptSelection: bool - optional, default false
+ * signatureEntryLocation: string - optional, see DATA_ENTRY_LOCATION, defaults to merchant settings
+ * signatureThreshold: int - optional, defaults to merchant settings
+ */
+/**
+ * Sale Result
+ * 
+ * success: bool
+ * message: string
+ * reason: string
+ * payment: object
+ */
+Clover.sale(option).then(result => {});
+
+/**
+ * Refund Option
+ * 
+ * paymentId: string - required
+ * orderId: string - required
+ * amount: int - optional, for partial refunds
+ */
+/**
+ * Refund Result
+ * 
+ * success: bool
+ * message: string
+ * reason: string
+ * refund: object
+ */
+Clover.refund(option).then(result => {});
+
+/**
+ * Manual Refund Option
+ * 
+ * amount: int - required
+ */
+/**
+ * Manual Refund Result
+ * 
+ * success: bool
+ * message: string
+ * reason: string
+ * credit: object
+ */
+Clover.manualRefund(option).then(result => {});
+
+/**
+ * Void Payment Option
+ * 
+ * paymentId: string, required
+ * orderId: string, required
+ * voidReason: string, required, see VOID_REASON
+ */
+/**
+ * Void Payment Result
+ * 
+ * success: bool
+ * message: string
+ * reason: string
+ * paymentId: string
+ */
+Clover.voidPayment(option).then(result =>{});
 ```
 
 ## Contants
 
 * `CARD_ENTRY_METHODS`
-  - `MAG_STRING`
+  - `MAG_STRIPE`
   - `ICC_CONTACT`
   - `NFC_CONTACTLESS`
   - `VAULTED_CARD`
   - `MANUAL`
+  - `ALL`
+* [DATA_ENTRY_LOCATION](https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/DataEntryLocation.html)
+* [VOID_REASON](https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/order/VoidReason.html)
   
 ## Troubleshooting
 
