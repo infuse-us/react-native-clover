@@ -67,7 +67,7 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
         if (response.getSuccess()) {
             mapper.putMap("payment", Payments.mapPayment(response.getPayment()));
         }
-        mBridgePaymentConnectorListener.onPaymentConnectorEvent(mapper.build());
+        mBridgePaymentConnectorListener.onResult(mapper.build());
     }
 
     @Override
@@ -77,7 +77,7 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
         if (response.getSuccess()) {
             mapper.putMap("credit", Payments.mapCredit(response.getCredit()));
         }
-        mBridgePaymentConnectorListener.onPaymentConnectorEvent(mapper.build());
+        mBridgePaymentConnectorListener.onResult(mapper.build());
     }
 
     @Override
@@ -89,7 +89,7 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
             // response.paymentId seems to be null
             mapper.putMap("refund", Payments.mapRefund(response.getRefund()));
         }
-        mBridgePaymentConnectorListener.onPaymentConnectorEvent(mapper.build());
+        mBridgePaymentConnectorListener.onResult(mapper.build());
     }
 
     @Override
@@ -104,7 +104,7 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
         if (response.getSuccess()) {
             mapper.setPaymentId(response.getPaymentId());
         }
-        mBridgePaymentConnectorListener.onPaymentConnectorEvent(mapper.build());
+        mBridgePaymentConnectorListener.onResult(mapper.build());
     }
 
     @Override
@@ -140,7 +140,7 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
             mapper.setPaymentId(response.getPaymentId());
             mapper.setRefundId(response.getRefundId());
         }
-        mBridgePaymentConnectorListener.onPaymentConnectorEvent(mapper.build());
+        mBridgePaymentConnectorListener.onResult(mapper.build());
     }
 
     @Override

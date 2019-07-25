@@ -30,8 +30,8 @@ public class BridgePaymentConnector {
     public BridgePaymentConnector(Context context, Account account, String raid) {
         BridgePaymentConnectorListener bridgePaymentConnectorListener = new BridgePaymentConnectorListener() {
             @Override
-            public void onPaymentConnectorEvent(WritableMap map) {
-                paymentPromise.resolve(map);
+            public void onResult(WritableMap result) {
+                paymentPromise.resolve(result);
             }
         };
         PaymentConnectorListener paymentConnectorListener = new PaymentConnectorListener(bridgePaymentConnectorListener);
