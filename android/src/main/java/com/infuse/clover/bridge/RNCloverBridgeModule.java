@@ -2,6 +2,8 @@ package com.infuse.clover.bridge;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -13,12 +15,14 @@ import android.util.Log;
 import android.view.WindowManager;
 
 import com.clover.sdk.util.CloverAccount;
+import com.clover.sdk.util.CloverAuth;
 import com.clover.sdk.util.CustomerMode;
 import com.clover.sdk.v1.Intents;
 import com.clover.sdk.v1.ServiceConnector;
 import com.clover.sdk.v1.merchant.MerchantConnector;
 import com.clover.sdk.v3.order.VoidReason;
 import com.clover.sdk.v3.payments.DataEntryLocation;
+import com.clover.sdk.v3.payments.TipMode;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -29,8 +33,10 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.infuse.clover.bridge.payments.BridgePaymentConnector;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -88,6 +94,14 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         }
         constants.put("VOID_REASON", voidReasons);
 
+        // Expose TipMode Enum
+        // https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/TipMode.html
+        WritableMap tipModes = Arguments.createMap();
+        for (TipMode tipMode : TipMode.values()) {
+            tipModes.putString(tipMode.name(), tipMode.name());
+        }
+        constants.put("TIP_MODE", tipModes);
+
         // Expose misc constants
         constants.put("isFlex", isFlex());
         constants.put("isMini", isMini());
@@ -118,9 +132,37 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         if (merchantConnector != null) {
             merchantConnector.getMerchant(new MerchantCallbackTask(promise));
         } else {
-            Log.d(TAG, "No merchantConnector");
-            promise.resolve(null);
+            promise.reject("error", "failure to initialize merchantConnector");
         }
+    }
+
+    @ReactMethod
+    public void authenticate(final boolean forceValidateToken, final int timeout, final Promise promise) {
+        startAccountChooser();
+        connect();
+        Thread authThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    CloverAuth.AuthResult result = CloverAuth.authenticate(
+                            getCurrentActivity(),
+                            account,
+                            forceValidateToken,
+                            (long) timeout,
+                            TimeUnit.MILLISECONDS
+                    );
+                    WritableMap map = Arguments.createMap();
+                    map.putBoolean("success", result.errorMessage == null);
+                    map.putString("authToken", result.authToken);
+                    map.putString("message", result.errorMessage);
+                    promise.resolve(map);
+                } catch (OperationCanceledException | AuthenticatorException | IOException e) {
+                    Log.e(TAG, "authentication_error", e);
+                    promise.reject("authentication_error", e.getMessage());
+                }
+            }
+        });
+        authThread.start();
     }
 
     private String getSpaVersion() {
@@ -202,7 +244,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     }
 
     @ReactMethod
-    public void cancelSPA(Promise promise) {
+    public void cancelSPA() {
         Intent intent = new Intent("com.clover.remote.terminal.securepay.action.V1_BREAK");
         Activity currentActivity = getCurrentActivity();
         if (currentActivity != null) {

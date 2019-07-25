@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.5](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.5%0Dv0.0.4) - (2019-07-24)
+
+### Added
+- Add maps `TIP_MODE` to constants. See [TipMode](https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/TipMode.html).
+- Add `tipMode`, `tippableAmount`, `tipSuggestions`, and `tipAmount` as optional parameters to sale. See [Tips](https://docs.clover.com/clover-platform/docs/using-per-transaction-settings#section--tips-) for details on these settings.
+- Add `autoAcceptSignature` as optional parameter to sale.
+- Add method `authenticate` to module
+- Experiment with adding JSDocs to d.ts file
+
+### Changed
+- Refactor PaymentConnectorListener logic
+
 ## [0.0.4](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.4%0Dv0.0.3) - (2019-07-16)
 
 ### Changed

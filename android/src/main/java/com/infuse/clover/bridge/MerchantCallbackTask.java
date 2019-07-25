@@ -22,7 +22,7 @@ public class MerchantCallbackTask extends MerchantConnector.MerchantCallback<Mer
         MerchantAddress mAddress = result.getAddress();
 
         WritableMap map = Arguments.createMap();
-        map.putString("merchantId", result.getId());
+        map.putString("id", result.getId());
         map.putString("name", result.getName());
         map.putString("email", result.getSupportEmail());
         map.putMap("location", this.mapLocation(mAddress));
@@ -41,7 +41,7 @@ public class MerchantCallbackTask extends MerchantConnector.MerchantCallback<Mer
     @Override
     public void onServiceConnectionFailure() {
         Log.d(RNCloverBridgeModule.TAG, "onServiceConnectionFailure");
-        sendResponse(false, null, null);
+        sendResponse(false, null, "Service Connection Failure");
     }
 
     private WritableMap mapLocation(MerchantAddress address) {
@@ -58,7 +58,7 @@ public class MerchantCallbackTask extends MerchantConnector.MerchantCallback<Mer
 
         map.putBoolean("success", success);
         if (!success) map.putString("statusMessage", statusMessage);
-        map.putMap("data", data);
+        map.putMap("merchant", data);
 
         promise.resolve(map);
     }

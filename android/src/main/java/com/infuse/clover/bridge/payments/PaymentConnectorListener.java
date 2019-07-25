@@ -20,8 +20,6 @@ import com.clover.sdk.v3.remotepay.VaultCardResponse;
 import com.clover.sdk.v3.remotepay.VerifySignatureRequest;
 import com.clover.sdk.v3.remotepay.VoidPaymentRefundResponse;
 import com.clover.sdk.v3.remotepay.VoidPaymentResponse;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
 
 public class PaymentConnectorListener implements IPaymentConnectorListener {
 
@@ -65,48 +63,33 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
     @Override
     public void onSaleResponse(SaleResponse response) {
         Log.d(TAG, "onSaleResponse");
-        WritableMap map = Arguments.createMap();
-        boolean success = response.getSuccess();
-        map.putBoolean("success", success);
-        if (success) {
-            map.putMap("payment", Payments.mapPayment(response.getPayment()));
-        } else {
-            map.putString("reason", response.getReason());
-            map.putString("message", response.getMessage());
+        ResultBuilder mapper = new ResultBuilder(response);
+        if (response.getSuccess()) {
+            mapper.putMap("payment", Payments.mapPayment(response.getPayment()));
         }
-        mBridgePaymentConnectorListener.onPaymentConnectorEvent(map);
+        mBridgePaymentConnectorListener.onPaymentConnectorEvent(mapper.build());
     }
 
     @Override
     public void onManualRefundResponse(ManualRefundResponse response) {
         Log.d(TAG, "onManualRefundResponse");
-        WritableMap map = Arguments.createMap();
-        boolean success = response.getSuccess();
-        map.putBoolean("success", success);
-        if (success) {
-            map.putMap("credit", Payments.mapCredit(response.getCredit()));
-        } else {
-            map.putString("reason", response.getReason());
-            map.putString("message", response.getMessage());
+        ResultBuilder mapper = new ResultBuilder(response);
+        if (response.getSuccess()) {
+            mapper.putMap("credit", Payments.mapCredit(response.getCredit()));
         }
-        mBridgePaymentConnectorListener.onPaymentConnectorEvent(map);
+        mBridgePaymentConnectorListener.onPaymentConnectorEvent(mapper.build());
     }
 
     @Override
     public void onRefundPaymentResponse(RefundPaymentResponse response) {
         Log.d(TAG, "onRefundPaymentResponse");
-        WritableMap map = Arguments.createMap();
-        boolean success = response.getSuccess();
-        map.putBoolean("success", success);
-        if (success) {
+        ResultBuilder mapper = new ResultBuilder(response);
+        if (response.getSuccess()) {
             // response.orderId seems to be null
             // response.paymentId seems to be null
-            map.putMap("refund", Payments.mapRefund(response.getRefund()));
-        } else {
-            map.putString("reason", response.getReason());
-            map.putString("message", response.getMessage());
+            mapper.putMap("refund", Payments.mapRefund(response.getRefund()));
         }
-        mBridgePaymentConnectorListener.onPaymentConnectorEvent(map);
+        mBridgePaymentConnectorListener.onPaymentConnectorEvent(mapper.build());
     }
 
     @Override
@@ -117,17 +100,11 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
     @Override
     public void onVoidPaymentResponse(VoidPaymentResponse response) {
         Log.d(TAG, "onVoidPaymentResponse");
-        WritableMap map = Arguments.createMap();
-        boolean success = response.getSuccess();
-        map.putBoolean("success", success);
-        if (success) {
-            String paymentId = response.getPaymentId();
-            map.putString("paymentId", paymentId);
-        } else {
-            map.putString("reason", response.getReason());
-            map.putString("message", response.getMessage());
+        ResultBuilder mapper = new ResultBuilder(response);
+        if (response.getSuccess()) {
+            mapper.setPaymentId(response.getPaymentId());
         }
-        mBridgePaymentConnectorListener.onPaymentConnectorEvent(map);
+        mBridgePaymentConnectorListener.onPaymentConnectorEvent(mapper.build());
     }
 
     @Override
@@ -158,17 +135,12 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
     @Override
     public void onVoidPaymentRefundResponse(VoidPaymentRefundResponse response) {
         Log.d(TAG, "onVoidPaymentRefundResponse");
-        WritableMap map = Arguments.createMap();
-        boolean success = response.getSuccess();
-        map.putBoolean("success", success);
-        if (success) {
-            map.putString("paymentId", response.getPaymentId());
-            map.putString("refundId", response.getRefundId());
-        } else {
-            map.putString("reason", response.getReason());
-            map.putString("message", response.getMessage());
+        ResultBuilder mapper = new ResultBuilder(response);
+        if (response.getSuccess()) {
+            mapper.setPaymentId(response.getPaymentId());
+            mapper.setRefundId(response.getRefundId());
         }
-        mBridgePaymentConnectorListener.onPaymentConnectorEvent(map);
+        mBridgePaymentConnectorListener.onPaymentConnectorEvent(mapper.build());
     }
 
     @Override

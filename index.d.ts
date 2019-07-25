@@ -2,8 +2,35 @@ interface ObjectRef {
   id: string;
 }
 
+interface TipSuggestion {
+  name: string;
+  percentage: number;
+}
+
 interface Result {
   success: boolean;
+}
+
+interface AuthenticationResult extends Result {
+  errorMessage: string;
+  authToken: string;
+}
+
+interface MerchantResult extends Result {
+  statusMessage?: string;
+  merchant: Merchant;
+}
+
+interface Merchant extends ObjectRef {
+  name: string;
+  email: string;
+  location: MerchantLocation;
+}
+
+interface MerchantLocation {
+  country: string;
+  city: string;
+  region: string;
 }
 
 interface TransactionResult extends Result {
@@ -62,6 +89,12 @@ interface VoidReason {
   USER_GIFTCARD_LOAD_CANCEL: string; 
 }
 
+interface TipMode {
+  NO_TIP: string;
+  TIP_PROVIDED: string;
+  ON_SCREEN_BEFORE_PAYMENT: string;
+}
+
 interface SaleOption {
   amount: number;
   externalPaymentId?: string;
@@ -71,8 +104,13 @@ interface SaleOption {
   disableDuplicateChecking?: boolean;
   disablePrinting?: boolean;
   disableReceiptSelection?: boolean;
-  signatureEntryLocation? : string;
-  signatureThreshold? : number;
+  signatureEntryLocation?: string;
+  signatureThreshold?: number;
+  autoAcceptSignature?: boolean;
+  tipAmount?: number;
+  tippableAmount?: number;
+  tipMode?: string;
+  tipSuggestions?: Array<TipSuggestion>;
 }
 
 interface SaleResult extends TransactionResult {
@@ -112,30 +150,68 @@ interface VoidPaymentResult extends TransactionResult {
 }
 
 declare const _default: {
-  // Payment Methods
+  // General Methods ///////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
+  /**
+  * Obtains authentication data from the Clover service.
+  * @param {boolean} [forceValidateToken = false] Flag to validate against API, increases latency, use only when needed.
+  * @param {number} [timeout = 10000] Timeout in milliseconds.
+  * @returns {Promise} A promise that resolves to an AuthenticationResult.
+  */
+  authenticate: (forceValidateToken?: boolean, timeout?: number) => Promise<AuthenticationResult>;
+  /**
+   * Obtains Merchant Info from the Clover service.
+   * @returns {Promise} A promise that resolves to a MerchantResult.
+   */
+  getMerchant: () => Promise<MerchantResult>;
+  enableCustomerMode: () => void;
+  disableCustomerMode: () => void;
+  print: (imagePath: string) => Promise<object>;
+  /**
+   * Obtains required Android runtime permissions, only needed if targeting API > 25.
+   * @returns {Promise<Result>} A promise that resolves to a Result.
+   */
+  startAccountChooserIfNeeded: () => Promise<Result>;
+
+  // Payment Methods ///////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
+  /**
+   * Readies the Clover Bridge for sending payment requests to Clover device. Must be called before calling any payment method and should be 
+   * called as soon as possible.
+   * @param {string} raid Remote Application Id. Obtained from Clover App dashboard.
+   */
   initializePaymentConnector: (raid: string) => void;
   sale: (option: SaleOption) => Promise<SaleResult>;
   refund: (option: RefundOption) => Promise<RefundResult>;
   manualRefund: (option: ManualRefundOption) => Promise<ManualRefundResult>;
   voidPayment: (option: VoidPaymentOption) => Promise<VoidPaymentResult>;
   voidPaymentRefund: () => Promise<object>;
-  cancelSPA: () => Promise<object>;
+  /**
+   * Forces the SPA to close
+   */
+  cancelSPA: () => void;
 
-  enableCustomerMode: () => void;
-  disableCustomerMode: () => void;
-  getMerchant: () => Promise<object>;
-  print: (imagePath: string) => Promise<object>;
-  startAccountChooserIfNeeded: () => Promise<Result>;
-
-  // Misc Methods
+  // Constant Methods //////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
   isFlex: () => boolean;
   isMini: () => boolean;
   getSpaVersion: () => string;
 
-  // Constants
+  // Enums/Constants ///////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
   CARD_ENTRY_METHOD: CardEntryMethod;
+  /**
+   * https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/DataEntryLocation.html
+   */
   DATA_ENTRY_LOCATION: DataEntryLocation;
+  /**
+   * https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/order/VoidReason.html
+   */
   VOID_REASON: VoidReason;
+  /**
+   * https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/TipMode.html
+   */
+  TIP_MODE: TipMode;
 }
 
 export default _default;

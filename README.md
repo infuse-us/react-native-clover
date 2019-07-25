@@ -33,6 +33,12 @@ React Native native module for the [Clover SDK](https://github.com/clover/clover
 ```javascript
 import Clover from '@infuse/react-native-clover';
 
+Clover.authenticate(forceValidateToken: Boolean = false, timeout: Number = 10000) => ({
+  success: Boolean,
+  authToken: String,
+  errorMessage: String,
+})
+
 Clover.getMerchant().then({ data } => { ... });
 
 Clover.enableCustomerMode();
@@ -63,6 +69,15 @@ Clover.initializePaymentConnector(String raid);
  * disableReceiptSelection: bool - optional, default false
  * signatureEntryLocation: string - optional, see DATA_ENTRY_LOCATION, defaults to merchant settings
  * signatureThreshold: int - optional, defaults to merchant settings
+ * autoAcceptSignature: boolean - optional, whether to ask for signature confirmation, default true
+ * tipAmount: int - optional, if TipMode is set to TIP_PROVIDED, this must be set
+ * tippableAmount: int - optional, amount used to calculate tip
+ * tipMode: string - optional, see TIP_MODE, defaults to merchant settings
+ * tipSuggestions: array - optional, see [TipSuggestions](https://docs.clover.com/clover-platform/docs/using-per-transaction-settings#section--tips-)
+ *     TipSuggestion {
+ *        name: string,
+ *        percentage: int,
+ *     }
  */
 /**
  * Sale Result
@@ -126,7 +141,7 @@ Clover.voidPayment(option).then(result =>{});
 
 ## Contants
 
-* `CARD_ENTRY_METHODS`
+* [CARD_ENTRY_METHODS](https://docs.clover.com/clover-platform/docs/using-per-transaction-settings#section--other-functions-)
     * `MAG_STRIPE`
     * `ICC_CONTACT`
     * `NFC_CONTACTLESS`
@@ -135,6 +150,10 @@ Clover.voidPayment(option).then(result =>{});
     * `ALL`
 * [DATA_ENTRY_LOCATION](https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/DataEntryLocation.html)
 * [VOID_REASON](https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/order/VoidReason.html)
+* [TIP_MODE](https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/TipMode.html)
+    * `NO_TIP`
+    * `TIP_PROVIDED`
+    * `ON_SCREEN_BEFORE_PAYMENT`
   
 ## Troubleshooting
 

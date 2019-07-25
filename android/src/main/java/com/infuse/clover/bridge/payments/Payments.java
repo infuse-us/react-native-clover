@@ -7,7 +7,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 
 public class Payments {
-    // Bridge constants of Clover per-transaction settings.
+    // Bridge constants for Clover per-transaction settings.
     static final String CARD_ENTRY_METHODS = "cardEntryMethods";
     static final String DISABLE_DUPLICATE_CHECKING = "disableDuplicateChecking";
     static final String DISABLE_RESTART_TRANSACTION_ON_FAIL = "disableRestartTransactionOnFail";
@@ -15,6 +15,11 @@ public class Payments {
     static final String DISABLE_RECEIPT_SELECTION = "disableReceiptSelection";
     static final String SIGNATURE_THRESHOLD = "signatureThreshold";
     static final String SIGNATURE_ENTRY_LOCATION = "signatureEntryLocation";
+    static final String AUTO_ACCEPT_SIGNATURE = "autoAcceptSignature";
+    static final String TIP_AMOUNT = "tipAmount";
+    static final String TIPPABLE_AMOUNT = "tippableAmount";
+    static final String TIP_MODE = "tipMode";
+    static final String TIP_SUGGESTIONS = "tipSuggestions";
 
     static WritableMap mapPayment(Payment payment) {
         WritableMap map = Arguments.createMap();

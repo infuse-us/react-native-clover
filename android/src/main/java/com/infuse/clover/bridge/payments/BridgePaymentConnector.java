@@ -2,17 +2,22 @@ package com.infuse.clover.bridge.payments;
 
 import android.accounts.Account;
 import android.content.Context;
+import android.util.Log;
 
 import com.clover.connector.sdk.v3.PaymentConnector;
 import com.clover.sdk.v3.connector.ExternalIdUtils;
+import com.clover.sdk.v3.merchant.TipSuggestion;
 import com.clover.sdk.v3.payments.DataEntryLocation;
+import com.clover.sdk.v3.payments.TipMode;
 import com.clover.sdk.v3.remotepay.ManualRefundRequest;
 import com.clover.sdk.v3.remotepay.RefundPaymentRequest;
 import com.clover.sdk.v3.remotepay.SaleRequest;
 import com.clover.sdk.v3.remotepay.VoidPaymentRefundRequest;
 import com.clover.sdk.v3.remotepay.VoidPaymentRequest;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 
 import java.util.ArrayList;
@@ -75,6 +80,24 @@ public class BridgePaymentConnector {
             }
             if (options.hasKey(Payments.SIGNATURE_THRESHOLD)) {
                 saleRequest.setSignatureThreshold((long) options.getInt(Payments.SIGNATURE_THRESHOLD));
+            }
+            if (options.hasKey(Payments.AUTO_ACCEPT_SIGNATURE)) {
+                saleRequest.setAutoAcceptSignature(options.getBoolean(Payments.AUTO_ACCEPT_SIGNATURE));
+            }
+            if (options.hasKey(Payments.TIP_AMOUNT)) {
+                saleRequest.setTipAmount((long) options.getInt(Payments.TIP_AMOUNT));
+            }
+            if (options.hasKey(Payments.TIPPABLE_AMOUNT)
+                    && !(options.getType(Payments.TIPPABLE_AMOUNT) == ReadableType.Null)) {
+                saleRequest.setTippableAmount((long) options.getInt(Payments.TIPPABLE_AMOUNT));
+            }
+            if (options.hasKey(Payments.TIP_MODE)) {
+                TipMode tipMode = TipMode.valueOf(options.getString(Payments.TIP_MODE));
+                saleRequest.setTipMode(tipMode);
+            }
+            if (options.hasKey(Payments.TIP_SUGGESTIONS)) {
+                ReadableArray tipSuggestions = options.getArray(Payments.TIP_SUGGESTIONS);
+                saleRequest.setTipSuggestions(buildTipSuggestions(tipSuggestions));
             }
 
             paymentConnector.sale(saleRequest);
@@ -196,5 +219,24 @@ public class BridgePaymentConnector {
             }
         }
         return errors;
+    }
+
+    private List<TipSuggestion> buildTipSuggestions(ReadableArray tips) {
+        final String NAME_PARAMETER = "name";
+        final String PERCENTAGE_PARAMETER = "percentage";
+        List<TipSuggestion> tipSuggestions = new ArrayList<>();
+        for (int i = 0; i < tips.size(); i++) {
+            ReadableMap tip = tips.getMap(i);
+            if (tip.hasKey(NAME_PARAMETER) && tip.getType(NAME_PARAMETER) == ReadableType.String
+                    && tip.hasKey(PERCENTAGE_PARAMETER) && tip.getType(PERCENTAGE_PARAMETER) == ReadableType.Number) {
+                TipSuggestion tipSuggestion = new TipSuggestion();
+                tipSuggestion.setName(tip.getString(NAME_PARAMETER));
+                tipSuggestion.setPercentage((long) tip.getInt(PERCENTAGE_PARAMETER));
+                tipSuggestions.add(tipSuggestion);
+            } else {
+                Log.e("Payments", "Skipping invalid TipSuggestion at index " + i);
+            }
+        }
+        return tipSuggestions;
     }
 }
