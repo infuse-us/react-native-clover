@@ -90,21 +90,21 @@ Clover.initializePaymentConnector(String raid);
 Clover.sale(option).then(result => {});
 
 /**
- * Refund Option
+ * Refund Payment Option
  * 
  * paymentId: string - required
  * orderId: string - required
  * amount: int - optional, for partial refunds
  */
 /**
- * Refund Result
+ * Refund Payment Result
  * 
  * success: bool
  * message: string
  * reason: string
  * refund: object
  */
-Clover.refund(option).then(result => {});
+Clover.refundPayment(option).then(result => {});
 
 /**
  * Manual Refund Option

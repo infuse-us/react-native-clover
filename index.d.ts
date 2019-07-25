@@ -117,13 +117,13 @@ interface SaleResult extends TransactionResult {
   payment: Payment;
 }
 
-interface RefundOption {
+interface RefundPaymentOption {
   paymentId: string;
   orderId: string;
   amount?: number;
 }
 
-interface RefundResult extends TransactionResult {
+interface RefundPaymentResult extends TransactionResult {
   refund: Refund;
 }
 
@@ -182,7 +182,7 @@ declare const _default: {
    */
   initializePaymentConnector: (raid: string) => void;
   sale: (option: SaleOption) => Promise<SaleResult>;
-  refund: (option: RefundOption) => Promise<RefundResult>;
+  refundPayment: (option: RefundPaymentOption) => Promise<RefundPaymentResult>;
   manualRefund: (option: ManualRefundOption) => Promise<ManualRefundResult>;
   voidPayment: (option: VoidPaymentOption) => Promise<VoidPaymentResult>;
   voidPaymentRefund: () => Promise<object>;
