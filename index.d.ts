@@ -121,6 +121,7 @@ interface RefundPaymentOption {
   paymentId: string;
   orderId: string;
   amount?: number;
+  setFullRefund?: boolean;
 }
 
 interface RefundPaymentResult extends TransactionResult {
@@ -149,6 +150,22 @@ interface VoidPaymentResult extends TransactionResult {
   paymentId: string;
 }
 
+interface VoidPaymentRefundOption {
+  paymentId: string;
+  orderId: string;
+}
+
+interface VoidPaymentRefundResult extends TransactionResult {
+  /**
+   * a blah test
+   */
+  paymentId: string;
+  refundId: string;
+}
+
+/**
+ * Another blah test
+ */
 declare const _default: {
   // General Methods ///////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,7 +202,7 @@ declare const _default: {
   refundPayment: (option: RefundPaymentOption) => Promise<RefundPaymentResult>;
   manualRefund: (option: ManualRefundOption) => Promise<ManualRefundResult>;
   voidPayment: (option: VoidPaymentOption) => Promise<VoidPaymentResult>;
-  voidPaymentRefund: () => Promise<object>;
+  voidPaymentRefund: (option: VoidPaymentRefundOption) => Promise<VoidPaymentRefundResult>;
   /**
    * Forces the SPA to close
    */

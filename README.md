@@ -95,6 +95,7 @@ Clover.sale(option).then(result => {});
  * paymentId: string - required
  * orderId: string - required
  * amount: int - optional, for partial refunds
+ * setFullRefund: boolean: optional, overrides amount
  */
 /**
  * Refund Payment Result

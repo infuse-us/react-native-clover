@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.6](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.6%0Dv0.0.5) - (2019-07-30)
+
+### Added
+- Expose `setFullRefund` to the JS bridge.
+
+### Changed
+- Clean up and refactor `BridgePaymentConnector` logic.
+
 ## [0.0.5](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.5%0Dv0.0.4) - (2019-07-24)
 
 ### Added

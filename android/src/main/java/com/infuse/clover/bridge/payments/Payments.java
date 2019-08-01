@@ -6,7 +6,7 @@ import com.clover.sdk.v3.payments.Refund;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 
-public class Payments {
+class Payments {
     // Bridge constants for Clover per-transaction settings.
     static final String CARD_ENTRY_METHODS = "cardEntryMethods";
     static final String DISABLE_DUPLICATE_CHECKING = "disableDuplicateChecking";
@@ -20,6 +20,14 @@ public class Payments {
     static final String TIPPABLE_AMOUNT = "tippableAmount";
     static final String TIP_MODE = "tipMode";
     static final String TIP_SUGGESTIONS = "tipSuggestions";
+    static final String SET_FULL_REFUND = "setFullRefund";
+    static final String AMOUNT = "amount";
+    static final String ORDER_ID = "orderId";
+    static final String PAYMENT_ID = "paymentId";
+    static final String REFUND_ID = "refundId";
+    static final String VOID_REASON = "voidReason";
+    static final String EXTERNAL_PAYMENT_ID = "externalPaymentId";
+    static final String GENERATE_EXTERNAL_PAYMENT_ID = "generateExternalPaymentId";
 
     static WritableMap mapPayment(Payment payment) {
         WritableMap map = Arguments.createMap();
