@@ -45,6 +45,14 @@ Clover.enableCustomerMode();
 Clover.disableCustomerMode();
 
 Clover.print(String imagePath).then(...);
+/**
+ * Print Payment Option
+ * 
+ * orderId: string - Required
+ * paymentId: string - Required
+ * flags: array - optional, array of PrintJob flags
+ **/
+Clover.printPayment(option);
 
 // Use this in situations where you are not ensured to have account access permission, API 26+
 Clover.startAccountChooserIfNeeded().then({ success: bool } => { ... });
@@ -61,6 +69,7 @@ Clover.initializePaymentConnector(String raid);
  *  
  * amount: int - Required
  * externalPaymentId: string - Required, unless generateExternalPaymentId is true
+ * printReceipt: bool - optional, auto print receipt without selection
  * generateExternalPaymentId: bool - optional, unless externalPaymentId is not provided, default false
  * cardEntryMethods: int - optional, see CARD_ENTRY_METHODS, defaults to MAG_STRIPE | ICC_CONTACT | NFC_CONTACTLESS
  * disableDuplicateChecking: bool -  optional, default false
@@ -94,6 +103,7 @@ Clover.sale(option).then(result => {});
  * 
  * paymentId: string - required
  * orderId: string - required
+ * printReceipt: bool - optional, auto print receipt without selection
  * amount: int - optional, for partial refunds
  * setFullRefund: boolean: optional, overrides amount
  */
@@ -111,6 +121,8 @@ Clover.refundPayment(option).then(result => {});
  * Manual Refund Option
  * 
  * amount: int - required
+ * externalPaymentId: string - required
+ * printReceipt: bool - optional, auto print receipt without selection
  */
 /**
  * Manual Refund Result
@@ -128,6 +140,7 @@ Clover.manualRefund(option).then(result => {});
  * paymentId: string, required
  * orderId: string, required
  * voidReason: string, required, see VOID_REASON
+ * printReceipt: bool - optional, auto print receipt without selection
  */
 /**
  * Void Payment Result
@@ -137,7 +150,7 @@ Clover.manualRefund(option).then(result => {});
  * reason: string
  * paymentId: string
  */
-Clover.voidPayment(option).then(result =>{});
+Clover.voidPayment(option).then(result => {});
 ```
 
 ## Contants
@@ -155,6 +168,7 @@ Clover.voidPayment(option).then(result =>{});
     * `NO_TIP`
     * `TIP_PROVIDED`
     * `ON_SCREEN_BEFORE_PAYMENT`
+* [PRINT_JOB_FLAG](https://clover.github.io/clover-android-sdk/com/clover/sdk/v1/printer/job/PrintJob.html)
   
 ## Troubleshooting
 

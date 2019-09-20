@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.RemoteException;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
@@ -17,19 +18,29 @@ import android.view.WindowManager;
 import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.util.CloverAuth;
 import com.clover.sdk.util.CustomerMode;
+import com.clover.sdk.v1.BindingException;
+import com.clover.sdk.v1.ClientException;
 import com.clover.sdk.v1.Intents;
-import com.clover.sdk.v1.ServiceConnector;
-import com.clover.sdk.v1.merchant.MerchantConnector;
+import com.clover.sdk.v1.ServiceException;
+import com.clover.sdk.v1.printer.job.PrintJob;
+import com.clover.sdk.v1.printer.job.StaticPaymentPrintJob;
+import com.clover.sdk.v1.printer.job.StaticReceiptPrintJob;
+import com.clover.sdk.v3.order.Order;
+import com.clover.sdk.v3.order.OrderConnector;
 import com.clover.sdk.v3.order.VoidReason;
 import com.clover.sdk.v3.payments.DataEntryLocation;
+import com.clover.sdk.v3.payments.Payment;
 import com.clover.sdk.v3.payments.TipMode;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.NoSuchKeyException;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.UnexpectedNativeTypeException;
 import com.facebook.react.bridge.WritableMap;
 import com.infuse.clover.bridge.payments.BridgePaymentConnector;
 
@@ -40,15 +51,13 @@ import java.util.concurrent.TimeUnit;
 
 import static android.app.Activity.RESULT_OK;
 
-class RNCloverBridgeModule extends ReactContextBaseJavaModule implements ServiceConnector.OnServiceConnectedListener {
+class RNCloverBridgeModule extends ReactContextBaseJavaModule {
 
     static final String TAG = "RNCloverBridge";
     private ReactApplicationContext mContext;
 
     private static final int CHOOSE_ACCOUNT_REQUEST = 41920;
 
-    private Account account;
-    private MerchantConnector merchantConnector;
     private BridgePaymentConnector bridgePaymentConnector;
 
     private Promise accountPromise;
@@ -76,6 +85,9 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         cardEntryMethods.putInt("NFC_CONTACTLESS", Intents.CARD_ENTRY_METHOD_NFC_CONTACTLESS);
         cardEntryMethods.putInt("VAULTED_CARD", Intents.CARD_ENTRY_METHOD_VAULTED_CARD);
         cardEntryMethods.putInt("ALL", Intents.CARD_ENTRY_METHOD_ALL);
+        cardEntryMethods.putInt("DEFAULT", Intents.CARD_ENTRY_METHOD_ICC_CONTACT
+                | Intents.CARD_ENTRY_METHOD_MAG_STRIPE
+                | Intents.CARD_ENTRY_METHOD_NFC_CONTACTLESS);
         constants.put("CARD_ENTRY_METHOD", cardEntryMethods);
 
         // Expose DataEntryLocation Enum
@@ -102,6 +114,19 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         }
         constants.put("TIP_MODE", tipModes);
 
+        // Expose PrintJob Flags
+        // https://clover.github.io/clover-android-sdk/com/clover/sdk/v1/printer/job/PrintJob.html
+        WritableMap printJobFlags = Arguments.createMap();
+        printJobFlags.putInt("FLAG_BILL", PrintJob.FLAG_BILL);
+        printJobFlags.putInt("FLAG_CUSTOMER", PrintJob.FLAG_CUSTOMER);
+        printJobFlags.putInt("FLAG_FORCE_SIGNATURE", PrintJob.FLAG_FORCE_SIGNATURE);
+        printJobFlags.putInt("FLAG_MERCHANT", PrintJob.FLAG_MERCHANT);
+        printJobFlags.putInt("FLAG_NO_SIGNATURE", PrintJob.FLAG_NO_SIGNATURE);
+        printJobFlags.putInt("FLAG_NONE", PrintJob.FLAG_NONE);
+        printJobFlags.putInt("FLAG_REFUND", PrintJob.FLAG_REFUND);
+        printJobFlags.putInt("FLAG_REPRINT", PrintJob.FLAG_REPRINT);
+        constants.put("PRINT_JOB_FLAG", printJobFlags);
+
         // Expose misc constants
         constants.put("isFlex", isFlex());
         constants.put("isMini", isMini());
@@ -114,7 +139,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     public void print(final String imagePath, final Promise promise) {
         PrinterWrapper printerWrapper = new PrinterWrapper(promise);
         Activity currentActivity = getCurrentActivity();
-        printerWrapper.print(currentActivity, account, imagePath);
+        printerWrapper.print(currentActivity, getAccount(), imagePath);
     }
 
     @ReactMethod
@@ -127,26 +152,18 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     @ReactMethod
     public void getMerchant(final Promise promise) {
-        startAccountChooser();
-        connect();
-        if (merchantConnector != null) {
-            merchantConnector.getMerchant(new MerchantCallbackTask(promise));
-        } else {
-            promise.reject("error", "failure to initialize merchantConnector");
-        }
+        new BridgeServiceConnector().getMerchantConnector(mContext).getMerchant(new MerchantCallbackTask(promise));
     }
 
     @ReactMethod
     public void authenticate(final boolean forceValidateToken, final int timeout, final Promise promise) {
-        startAccountChooser();
-        connect();
         Thread authThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     CloverAuth.AuthResult result = CloverAuth.authenticate(
                             getCurrentActivity(),
-                            account,
+                            getAccount(),
                             forceValidateToken,
                             (long) timeout,
                             TimeUnit.MILLISECONDS
@@ -194,8 +211,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
 
     @ReactMethod
     public void initializePaymentConnector(String raid) {
-        startAccountChooser();
-        bridgePaymentConnector = new BridgePaymentConnector(mContext, account, raid);
+        bridgePaymentConnector = new BridgePaymentConnector(mContext, raid);
     }
 
     @ReactMethod
@@ -244,6 +260,31 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     }
 
     @ReactMethod
+    public void printPayment(ReadableMap options) {
+        try {
+            OrderConnector orderConnector = new BridgeServiceConnector().getOrderConnector(mContext);
+            String orderId = options.getString("orderId");
+            String paymentId = options.getString("paymentId");
+            Order order = orderConnector.getOrder(orderId);
+            Payment payment = BridgePaymentConnector.findPayment(order.getPayments(), paymentId);
+            if (payment != null) {
+                StaticReceiptPrintJob.Builder builder = new StaticPaymentPrintJob.Builder().payment(payment).paymentId(paymentId);
+                if (options.hasKey("flags")) {
+                    ReadableArray flags = options.getArray("flags");
+                    for (int i = 0; i < flags.size(); i++) {
+                        builder.flag(flags.getInt(i));
+                    }
+                }
+                builder.build().print(mContext, getAccount());
+            }
+        } catch (RemoteException | ClientException | ServiceException | BindingException e) {
+            Log.e(TAG, "", e);
+        } catch (NoSuchKeyException | UnexpectedNativeTypeException e) {
+            Log.e(TAG, "RN", e);
+        }
+    }
+
+    @ReactMethod
     public void cancelSPA() {
         Intent intent = new Intent("com.clover.remote.terminal.securepay.action.V1_BREAK");
         Activity currentActivity = getCurrentActivity();
@@ -255,8 +296,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
     @ReactMethod
     @TargetApi(27)
     public void startAccountChooserIfNeeded(Promise promise) {
-        startAccountChooser();
-        if (account != null) {
+        if (getAccount() != null) {
             WritableMap map = Arguments.createMap();
             map.putBoolean("success", true);
             promise.resolve(map);
@@ -274,37 +314,12 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule implements Service
         }
     }
 
-    private void startAccountChooser() {
-        account = CloverAccount.getAccount(mContext);
-    }
-
-    private void connect() {
-        disconnect();
-        if (account != null) {
-            merchantConnector = new MerchantConnector(mContext, account, this);
-            merchantConnector.connect();
-        }
-    }
-
-    private void disconnect() {
-        if (merchantConnector != null) {
-            merchantConnector.disconnect();
-            merchantConnector = null;
-        }
-    }
-
     private void paymentConnectorReject(Promise promise) {
         promise.reject("error", "PaymentConnector not initialized.");
     }
 
-    @Override
-    public void onServiceConnected(ServiceConnector connector) {
-        Log.i(TAG, "service connected: " + connector);
-    }
-
-    @Override
-    public void onServiceDisconnected(ServiceConnector connector) {
-        Log.i(TAG, "service disconnected: " + connector);
+    private Account getAccount() {
+        return BridgeServiceConnector.getAccount(mContext);
     }
 
     private final ActivityEventListener activityEventListener = new ActivityEventListener() {

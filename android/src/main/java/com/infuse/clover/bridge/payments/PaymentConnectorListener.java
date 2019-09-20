@@ -3,6 +3,9 @@ package com.infuse.clover.bridge.payments;
 import android.util.Log;
 
 import com.clover.sdk.v3.connector.IPaymentConnectorListener;
+import com.clover.sdk.v3.payments.Credit;
+import com.clover.sdk.v3.payments.Payment;
+import com.clover.sdk.v3.payments.Refund;
 import com.clover.sdk.v3.remotepay.AuthResponse;
 import com.clover.sdk.v3.remotepay.CapturePreAuthResponse;
 import com.clover.sdk.v3.remotepay.CloseoutResponse;
@@ -65,9 +68,12 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
         Log.d(TAG, "onSaleResponse");
         ResultBuilder mapper = new ResultBuilder(response);
         if (response.getSuccess()) {
-            mapper.putMap("payment", Payments.mapPayment(response.getPayment()));
+            Payment payment = response.getPayment();
+            mapper.putMap("payment", Payments.mapPayment(payment));
+            mBridgePaymentConnectorListener.onResult(mapper.build(), payment);
+        } else {
+            mBridgePaymentConnectorListener.onResult(mapper.build());
         }
-        mBridgePaymentConnectorListener.onResult(mapper.build());
     }
 
     @Override
@@ -75,9 +81,12 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
         Log.d(TAG, "onManualRefundResponse");
         ResultBuilder mapper = new ResultBuilder(response);
         if (response.getSuccess()) {
-            mapper.putMap("credit", Payments.mapCredit(response.getCredit()));
+            Credit credit = response.getCredit();
+            mapper.putMap("credit", Payments.mapCredit(credit));
+            mBridgePaymentConnectorListener.onResult(mapper.build(), credit);
+        } else {
+            mBridgePaymentConnectorListener.onResult(mapper.build());
         }
-        mBridgePaymentConnectorListener.onResult(mapper.build());
     }
 
     @Override
@@ -87,9 +96,12 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
         if (response.getSuccess()) {
             // response.orderId seems to be null
             // response.paymentId seems to be null
-            mapper.putMap("refund", Payments.mapRefund(response.getRefund()));
+            Refund refund = response.getRefund();
+            mapper.putMap("refund", Payments.mapRefund(refund));
+            mBridgePaymentConnectorListener.onResult(mapper.build(), refund);
+        } else {
+            mBridgePaymentConnectorListener.onResult(mapper.build());
         }
-        mBridgePaymentConnectorListener.onResult(mapper.build());
     }
 
     @Override
@@ -102,9 +114,12 @@ public class PaymentConnectorListener implements IPaymentConnectorListener {
         Log.d(TAG, "onVoidPaymentResponse");
         ResultBuilder mapper = new ResultBuilder(response);
         if (response.getSuccess()) {
-            mapper.setPaymentId(response.getPaymentId());
+            String paymentId = response.getPaymentId();
+            mapper.setPaymentId(paymentId);
+            mBridgePaymentConnectorListener.onResult(mapper.build(), paymentId);
+        } else {
+            mBridgePaymentConnectorListener.onResult(mapper.build());
         }
-        mBridgePaymentConnectorListener.onResult(mapper.build());
     }
 
     @Override

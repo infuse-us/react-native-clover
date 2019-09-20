@@ -1,2 +1,4 @@
 -keep interface com.clover.sdk.v3.payments.** { *; }
 -keep class com.clover.sdk.v1.printer.** { *; }
+-keep class com.clover.sdk.v3.pay.** { *; }
+-keep class com.clover.sdk.v3.order.** { *; }

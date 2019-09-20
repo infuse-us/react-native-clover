@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.0.7](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.7%0Dv0.0.6) - (2019-09-20)
+
+### Added
+- Add `BridgeServiceConnector` to handle Clover service connection rather than loading it on the ReactNativeModule.
+- Add `printReceipt` flag to `sale`, `manualRefund`, `voidPayment` and `refundPayment`.
+- Add `PrintJob` flags to constants. See [PrintJob](https://clover.github.io/clover-android-sdk/com/clover/sdk/v1/printer/job/PrintJob.html).
+- Add `printPayment` ReactMethod to bridge.
+
+### Changed
+- Change `BridgePaymentConnectorListener` with additional overloaded `onResult` methods.
+- Change `BridgePaymentConnector` and refactored to use `BridgeServiceConnector`. Update the `BridgePaymentConnector` methods. Add logic to handle `printReceipt`.
+- Refactor `Payments` methods to DRY it up a bit.
+- Change `PaymentConnectorListener` for `sale`, `manualRefund`, `voidPayment`, and `refundPayment` to use updated `BridgePaymentConnectorListener`.
+- Update `index.d.ts` to reflect changes.
+
+### Removed
+- Remove all ServiceConnector logic and variables from `RNCloverBridgeModule`.
+
 ## [0.0.6](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.6%0Dv0.0.5) - (2019-07-30)
 
 ### Added

@@ -11,6 +11,10 @@ interface Result {
   success: boolean;
 }
 
+interface Tender extends ObjectRef {
+  label: string;
+}
+
 interface AuthenticationResult extends Result {
   errorMessage: string;
   authToken: string;
@@ -49,13 +53,17 @@ interface Payment extends Transaction {
   offline: boolean;
   tipAmount: number;
   order: ObjectRef;
+  tender: Tender;
 }
 
 interface Refund extends Transaction {
   payment: ObjectRef;
 }
 
-interface Credit extends Transaction { }
+interface Credit extends Transaction { 
+  order: ObjectRef;
+  tender: Tender;
+}
 
 interface CardEntryMethod {
   ICC_CONTACT: number;
@@ -64,6 +72,10 @@ interface CardEntryMethod {
   NFC_CONTACTLESS: number;
   VAULTED_CARD: number;
   ALL: number;
+  /**
+   * Custom method that matches Clover default of ICC_CONTACT, MAG_SWIPE, and NFC_CONTACTLESS
+   */
+  DEFAULT: number;
 }
 
 interface DataEntryLocation {
@@ -95,6 +107,17 @@ interface TipMode {
   ON_SCREEN_BEFORE_PAYMENT: string;
 }
 
+interface PrintJobFlag {
+  FLAG_BILL: number;
+  FLAG_CUSTOMER: number;
+  FLAG_FORCE_SIGNATURE: number;
+  FLAG_MERCHANT: number;
+  FLAG_NO_SIGNATURE: number;
+  FLAG_NONE: number;
+  FLAG_REFUND: number;
+  FLAG_REPRINT: number;
+}
+
 interface SaleOption {
   amount: number;
   externalPaymentId?: string;
@@ -111,6 +134,7 @@ interface SaleOption {
   tippableAmount?: number;
   tipMode?: string;
   tipSuggestions?: Array<TipSuggestion>;
+  printReceipt?: boolean;
 }
 
 interface SaleResult extends TransactionResult {
@@ -122,6 +146,7 @@ interface RefundPaymentOption {
   orderId: string;
   amount?: number;
   setFullRefund?: boolean;
+  printReceipt?: boolean;
 }
 
 interface RefundPaymentResult extends TransactionResult {
@@ -134,6 +159,7 @@ interface ManualRefundOption {
   generateExternalPaymentId?: boolean;
   cardEntryMethods?: number;
   disableRestartTransactionOnFail?: boolean;
+  printReceipt?: boolean;
 }
 
 interface ManualRefundResult extends TransactionResult {
@@ -144,6 +170,7 @@ interface VoidPaymentOption {
   paymentId: string;
   orderId: string;
   voidReason: string;
+  printReceipt?: boolean;
 }
 
 interface VoidPaymentResult extends TransactionResult {
@@ -156,11 +183,14 @@ interface VoidPaymentRefundOption {
 }
 
 interface VoidPaymentRefundResult extends TransactionResult {
-  /**
-   * a blah test
-   */
   paymentId: string;
   refundId: string;
+}
+
+interface PrintPaymentOption {
+  orderId: string;
+  paymentId: string;
+  flags?: Array<number>;
 }
 
 /**
@@ -184,6 +214,7 @@ declare const _default: {
   enableCustomerMode: () => void;
   disableCustomerMode: () => void;
   print: (imagePath: string) => Promise<object>;
+  printPayment: (option: PrintPaymentOption) => void;
   /**
    * Obtains required Android runtime permissions, only needed if targeting API > 25.
    * @returns {Promise<Result>} A promise that resolves to a Result.
@@ -229,6 +260,10 @@ declare const _default: {
    * https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/TipMode.html
    */
   TIP_MODE: TipMode;
+  /**
+   * https://clover.github.io/clover-android-sdk/com/clover/sdk/v1/printer/job/PrintJob.html
+   */
+  PRINT_JOB_FLAG: PrintJobFlag;
 }
 
 export default _default;

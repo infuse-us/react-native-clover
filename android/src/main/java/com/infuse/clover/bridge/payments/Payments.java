@@ -1,5 +1,7 @@
 package com.infuse.clover.bridge.payments;
 
+import com.clover.sdk.v3.base.Reference;
+import com.clover.sdk.v3.base.Tender;
 import com.clover.sdk.v3.payments.Credit;
 import com.clover.sdk.v3.payments.Payment;
 import com.clover.sdk.v3.payments.Refund;
@@ -42,10 +44,11 @@ class Payments {
         // clientCreatedTime seems to be null
         // modifiedTime seems to be null
 
-        // Add in order reference id
-        WritableMap orderMap = Arguments.createMap();
-        orderMap.putString("id", payment.getOrder().getId());
-        map.putMap("order", orderMap);
+        // Add in Tender
+        map.putMap("tender", buildTenderMap(payment.getTender()));
+
+        // Add in Order Ref
+        map.putMap("order", buildReference(payment.getOrder()));
 
         return map;
     }
@@ -57,10 +60,8 @@ class Payments {
         map.putInt("amount", refund.getAmount().intValue());
         map.putString("createdTime", refund.getCreatedTime().toString());
 
-        // Add in payment reference id
-        WritableMap paymentMap = Arguments.createMap();
-        paymentMap.putString("id", refund.getPayment().getId());
-        map.putMap("payment", paymentMap);
+        // Add in Payment Ref
+        map.putMap("payment", buildReference(refund.getPayment()));
 
         return map;
     }
@@ -72,6 +73,27 @@ class Payments {
         map.putInt("amount", credit.getAmount().intValue());
         map.putString("createdTime", credit.getCreatedTime().toString());
 
+        // Add in Order Ref
+        map.putMap("order", buildReference(credit.getOrderRef()));
+
+        // Add in Tender map
+        map.putMap("tender", buildTenderMap(credit.getTender()));
+
+        return map;
+    }
+
+    private static WritableMap buildTenderMap(Tender tender) {
+        WritableMap map = Arguments.createMap();
+        if (tender != null) {
+            map.putString("id", tender.getId());
+            map.putString("label", tender.getLabel());
+        }
+        return map;
+    }
+
+    private static WritableMap buildReference(Reference ref) {
+        WritableMap map = Arguments.createMap();
+        map.putString("id", ref.getId());
         return map;
     }
 

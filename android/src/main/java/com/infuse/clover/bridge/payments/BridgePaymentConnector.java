@@ -2,12 +2,25 @@ package com.infuse.clover.bridge.payments;
 
 import android.accounts.Account;
 import android.content.Context;
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.clover.connector.sdk.v3.PaymentConnector;
+import com.clover.sdk.v1.BindingException;
+import com.clover.sdk.v1.ClientException;
+import com.clover.sdk.v1.ServiceException;
+import com.clover.sdk.v1.printer.job.PrintJob;
+import com.clover.sdk.v1.printer.job.StaticCreditPrintJob;
+import com.clover.sdk.v1.printer.job.StaticPaymentPrintJob;
+import com.clover.sdk.v1.printer.job.StaticReceiptPrintJob;
 import com.clover.sdk.v3.connector.ExternalIdUtils;
 import com.clover.sdk.v3.merchant.TipSuggestion;
+import com.clover.sdk.v3.order.Order;
+import com.clover.sdk.v3.order.OrderConnector;
+import com.clover.sdk.v3.payments.Credit;
 import com.clover.sdk.v3.payments.DataEntryLocation;
+import com.clover.sdk.v3.payments.Payment;
+import com.clover.sdk.v3.payments.Refund;
 import com.clover.sdk.v3.payments.TipMode;
 import com.clover.sdk.v3.remotepay.ManualRefundRequest;
 import com.clover.sdk.v3.remotepay.RefundPaymentRequest;
@@ -21,6 +34,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.UnexpectedNativeTypeException;
 import com.facebook.react.bridge.WritableMap;
+import com.infuse.clover.bridge.BridgeServiceConnector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,20 +43,59 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class BridgePaymentConnector {
+    private final static String PRINT_RECEIPT = "printReceipt";
     private PaymentConnector paymentConnector;
     private Promise paymentPromise;
-    private ExecutorService executor;
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public BridgePaymentConnector(Context context, Account account, String raid) {
+    private boolean printReceipt = false;
+    private String orderId;
+
+    static public Payment findPayment(List<Payment> payments, String paymentId) {
+        for (Payment payment : payments) {
+            if (payment.getId().equals(paymentId)) {
+                return payment;
+            }
+        }
+        return null;
+    }
+
+    public BridgePaymentConnector(final Context context, String raid) {
+        final Account account = BridgeServiceConnector.getAccount(context);
         BridgePaymentConnectorListener bridgePaymentConnectorListener = new BridgePaymentConnectorListener() {
             @Override
             public void onResult(WritableMap result) {
+                cleanup();
                 paymentPromise.resolve(result);
+            }
+            @Override
+            public void onResult(WritableMap result, Payment payment) {
+                if (printReceipt) {
+                    StaticReceiptPrintJob.Builder builder = new StaticPaymentPrintJob.Builder().payment(payment);
+                    builder.build().print(context, account);
+                }
+                onResult(result);
+            }
+            @Override
+            public void onResult(WritableMap result, Credit credit) {
+                if (printReceipt) {
+                    new StaticCreditPrintJob.Builder().credit(credit).build().print(context, account);
+                }
+                onResult(result);
+            }
+            @Override
+            public void onResult(WritableMap result, final Refund refund) {
+                onRefundOrVoidResult(context, refund.getPayment().getId(), false);
+                onResult(result);
+            }
+            @Override
+            public void onResult(WritableMap result, String paymentId) {
+                onRefundOrVoidResult(context, paymentId, true);
+                onResult(result);
             }
         };
         PaymentConnectorListener paymentConnectorListener = new PaymentConnectorListener(bridgePaymentConnectorListener);
         paymentConnector = new PaymentConnector(context, account, paymentConnectorListener, raid);
-        executor = Executors.newSingleThreadExecutor();
     }
 
     public void sale(final ReadableMap options, Promise promise) {
@@ -51,6 +104,7 @@ public class BridgePaymentConnector {
         startConnector(new Runnable() {
             @Override
             public void run() {
+                setPrintReceipt(options);
                 SaleRequest saleRequest = new SaleRequest();
 
                 // Set required transaction settings
@@ -112,6 +166,8 @@ public class BridgePaymentConnector {
         startConnector(new Runnable() {
             @Override
             public void run() {
+                setPrintReceipt(options);
+                setOrderId(options);
                 RefundPaymentRequest refundPaymentRequest = new RefundPaymentRequest();
 
                 // Set required transaction settings
@@ -139,6 +195,7 @@ public class BridgePaymentConnector {
         startConnector(new Runnable() {
             @Override
             public void run() {
+                setPrintReceipt(options);
                 ManualRefundRequest manualRefundRequest = new ManualRefundRequest();
 
                 // Set required transaction settings
@@ -169,6 +226,8 @@ public class BridgePaymentConnector {
         startConnector(new Runnable() {
             @Override
             public void run() {
+                setPrintReceipt(options);
+                setOrderId(options);
                 VoidPaymentRequest voidPaymentRequest = new VoidPaymentRequest();
 
                 // Set required transaction settings
@@ -232,8 +291,55 @@ public class BridgePaymentConnector {
             executor.submit(runner).get();
         } catch (ExecutionException | InterruptedException e) {
             Log.e("ReactNativeClover", "", e);
+            cleanup();
             promise.reject(e.getCause().getClass().getSimpleName(), e.getMessage());
 
+        }
+    }
+
+    private void cleanup() {
+        printReceipt = false;
+        orderId = null;
+    }
+
+    private void setPrintReceipt(ReadableMap options) {
+        if (options.hasKey(PRINT_RECEIPT)) {
+            printReceipt = options.getBoolean(PRINT_RECEIPT);
+        }
+    }
+
+    private void setOrderId(ReadableMap options) {
+        orderId = options.getString(Payments.ORDER_ID);
+    }
+
+    private void onRefundOrVoidResult(final Context context, final String paymentId, final boolean isVoid) {
+        final Account account = BridgeServiceConnector.getAccount(context);
+        final String ordId = orderId;
+        if (printReceipt && orderId != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        OrderConnector orderConnector = new BridgeServiceConnector().getOrderConnector(context);
+                        Order order = orderConnector.getOrder(ordId);
+                        List<Payment> payments = isVoid ? order.getVoids() : order.getPayments();
+                        Payment payment = findPayment(payments, paymentId);
+
+                        if (payment != null) {
+                            StaticReceiptPrintJob.Builder builder =
+                                    new StaticPaymentPrintJob.Builder().payment(payment).paymentId(payment.getId());
+                            if (isVoid) {
+                                builder.reason("VOIDED");
+                            } else {
+                                builder.flag(PrintJob.FLAG_REFUND);
+                            }
+                            builder.build().print(context, account);
+                        }
+                    } catch (RemoteException | ClientException | ServiceException | BindingException e) {
+                        Log.e("RNCloverBridge", "", e);
+                    }
+                }
+            }).start();
         }
     }
 }
