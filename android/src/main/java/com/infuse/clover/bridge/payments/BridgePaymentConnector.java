@@ -60,7 +60,7 @@ public class BridgePaymentConnector {
         return null;
     }
 
-    public BridgePaymentConnector(final Context context, String raid) {
+    public void initialize(final Context context, String raid) {
         final Account account = BridgeServiceConnector.getAccount(context);
         BridgePaymentConnectorListener bridgePaymentConnectorListener = new BridgePaymentConnectorListener() {
             @Override
@@ -104,6 +104,7 @@ public class BridgePaymentConnector {
         startConnector(new Runnable() {
             @Override
             public void run() {
+                checkReady();
                 setPrintReceipt(options);
                 SaleRequest saleRequest = new SaleRequest();
 
@@ -166,6 +167,7 @@ public class BridgePaymentConnector {
         startConnector(new Runnable() {
             @Override
             public void run() {
+                checkReady();
                 setPrintReceipt(options);
                 setOrderId(options);
                 RefundPaymentRequest refundPaymentRequest = new RefundPaymentRequest();
@@ -195,6 +197,7 @@ public class BridgePaymentConnector {
         startConnector(new Runnable() {
             @Override
             public void run() {
+                checkReady();
                 setPrintReceipt(options);
                 ManualRefundRequest manualRefundRequest = new ManualRefundRequest();
 
@@ -226,6 +229,7 @@ public class BridgePaymentConnector {
         startConnector(new Runnable() {
             @Override
             public void run() {
+                checkReady();
                 setPrintReceipt(options);
                 setOrderId(options);
                 VoidPaymentRequest voidPaymentRequest = new VoidPaymentRequest();
@@ -246,6 +250,7 @@ public class BridgePaymentConnector {
         startConnector(new Runnable() {
             @Override
             public void run() {
+                checkReady();
                 VoidPaymentRefundRequest voidPaymentRefundRequest = new VoidPaymentRefundRequest();
 
                 // Set required transaction settings
@@ -255,6 +260,12 @@ public class BridgePaymentConnector {
                 paymentConnector.voidPaymentRefund(voidPaymentRefundRequest);
             }
         }, promise);
+    }
+
+    private void checkReady() {
+        if (paymentConnector == null) {
+            throw new NullPointerException("Please run Clover.initializePaymentConnector first!");
+        }
     }
 
     private String getExternalPaymentId(ReadableMap options) {

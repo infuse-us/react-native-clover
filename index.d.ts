@@ -247,6 +247,10 @@ declare const _default: {
 
   // Enums/Constants ///////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////
+  /**
+   * Clover HSN
+   */
+  HARDWARE_SERIAL_NUMBER: String;
   CARD_ENTRY_METHOD: CardEntryMethod;
   /**
    * https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/payments/DataEntryLocation.html

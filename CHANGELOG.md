@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.8](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.8%0Dv0.0.7) - (2019-09-24)
+
+### Added
+- Add `HARDWARE_SERIAL_NUMBER` to constants. Clover uses a deprecated method to obtain this value and other libraries have started to migrate away.
+
+### Changed
+- Moved constants logic to a separate `Constants` class.
+- Refactor how to initialize the `BridgePaymentConnector` in order to lower code reuse and simplify error handling when calling a paymentConnector method when it hasn't been initialized yet.
+
 ## [0.0.7](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.7%0Dv0.0.6) - (2019-09-20)
 
 ### Added

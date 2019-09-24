@@ -10,4 +10,6 @@ export default {
   isFlex: () => RNCloverBridge.isFlex,
   isMini: () => RNCloverBridge.isMini,
   getSpaVersion: () => RNCloverBridge.getSpaVersion,
+  disableCustomerMode: (requirePasscode = false) =>
+    RNCloverBridge.disableCustomerMode(requirePasscode),
 };

@@ -155,6 +155,7 @@ Clover.voidPayment(option).then(result => {});
 
 ## Contants
 
+* `HARDWARE_SERIAL_NUMBER`
 * [CARD_ENTRY_METHODS](https://docs.clover.com/clover-platform/docs/using-per-transaction-settings#section--other-functions-)
     * `MAG_STRIPE`
     * `ICC_CONTACT`
