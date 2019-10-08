@@ -21,6 +21,8 @@ public class Constants {
     static final String TIP_MODE = "TIP_MODE";
     static final String PRINT_JOB_FLAG = "PRINT_JOB_FLAG";
 
+    static final String EVENT_BARCODE_SCANNER = "EVENT_BARCODE_SCANNER";
+
     static public class Builder {
         private Map<String, Object> constants;
 
@@ -36,6 +38,11 @@ public class Constants {
         public Map<String, Object> build() {
             // Expose Clover Hardware Serial Number
             constants.put(HARDWARE_SERIAL_NUMBER, Build.SERIAL);
+
+            // Build Event Names
+            WritableMap bridgeEvents = Arguments.createMap();
+            bridgeEvents.putString("BARCODE_SCANNER", EVENT_BARCODE_SCANNER);
+            constants.put("EVENT", bridgeEvents);
 
             // Expose card entry methods
             WritableMap cardEntryMethods = Arguments.createMap();

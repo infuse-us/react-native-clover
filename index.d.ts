@@ -1,57 +1,61 @@
 interface ObjectRef {
-  id: string;
+  id: String;
+}
+
+interface BridgeEvent {
+  BARCODE_SCANNER: String;
 }
 
 interface TipSuggestion {
-  name: string;
-  percentage: number;
+  name: String;
+  percentage: Number;
 }
 
 interface Result {
-  success: boolean;
+  success: Boolean;
 }
 
 interface Tender extends ObjectRef {
-  label: string;
+  label: String;
 }
 
 interface AuthenticationResult extends Result {
-  errorMessage: string;
-  authToken: string;
+  errorMessage: String;
+  authToken: String;
 }
 
 interface MerchantResult extends Result {
-  statusMessage?: string;
+  statusMessage?: String;
   merchant: Merchant;
 }
 
 interface Merchant extends ObjectRef {
-  name: string;
-  email: string;
+  name: String;
+  email: String;
   location: MerchantLocation;
 }
 
 interface MerchantLocation {
-  country: string;
-  city: string;
-  region: string;
+  country: String;
+  city: String;
+  region: String;
 }
 
 interface TransactionResult extends Result {
-  reason?: string;
-  message?: string;
+  reason?: String;
+  message?: String;
 }
 
 interface Transaction {
-  id: string;
-  amount: number;
-  createdTime: string;
+  id: String;
+  amount: Number;
+  createdTime: String;
 }
 
 interface Payment extends Transaction {
-  externalPaymentId: string;
-  offline: boolean;
-  tipAmount: number;
+  externalPaymentId: String;
+  offline: Boolean;
+  tipAmount: Number;
   order: ObjectRef;
   tender: Tender;
 }
@@ -66,75 +70,75 @@ interface Credit extends Transaction {
 }
 
 interface CardEntryMethod {
-  ICC_CONTACT: number;
-  MAG_STRIPE: number;
-  MANUAL: number;
-  NFC_CONTACTLESS: number;
-  VAULTED_CARD: number;
-  ALL: number;
+  ICC_CONTACT: Number;
+  MAG_STRIPE: Number;
+  MANUAL: Number;
+  NFC_CONTACTLESS: Number;
+  VAULTED_CARD: Number;
+  ALL: Number;
   /**
    * Custom method that matches Clover default of ICC_CONTACT, MAG_SWIPE, and NFC_CONTACTLESS
    */
-  DEFAULT: number;
+  DEFAULT: Number;
 }
 
 interface DataEntryLocation {
-  NONE: string;
-  ON_PAPER: string;
-  ON_SCREEN: string;
+  NONE: String;
+  ON_PAPER: String;
+  ON_SCREEN: String;
 }
 
 interface VoidReason {
-  AUTH_CLOSED_NEW_CARD: string;
-  DEVELOPER_PAY_PARTIAL_AUTH: string;
-  DEVELOPER_PAY_TIP_ADJUST_FAILED: string;
-  FAILED: string;
-  GIFTCARD_LOAD_FAILED: string;
-  NOT_APPROVED: string; 
-  REJECT_DUPLICATE: string; 
-  REJECT_OFFLINE: string; 
-  REJECT_PARTIAL_AUTH: string;
-  REJECT_SIGNATURE: string;
-  TRANSPORT_ERROR: string; 
-  USER_CANCEL: string; 
-  USER_CUSTOMER_CANCEL: string; 
-  USER_GIFTCARD_LOAD_CANCEL: string; 
+  AUTH_CLOSED_NEW_CARD: String;
+  DEVELOPER_PAY_PARTIAL_AUTH: String;
+  DEVELOPER_PAY_TIP_ADJUST_FAILED: String;
+  FAILED: String;
+  GIFTCARD_LOAD_FAILED: String;
+  NOT_APPROVED: String; 
+  REJECT_DUPLICATE: String; 
+  REJECT_OFFLINE: String; 
+  REJECT_PARTIAL_AUTH: String;
+  REJECT_SIGNATURE: String;
+  TRANSPORT_ERROR: String; 
+  USER_CANCEL: String; 
+  USER_CUSTOMER_CANCEL: String; 
+  USER_GIFTCARD_LOAD_CANCEL: String; 
 }
 
 interface TipMode {
-  NO_TIP: string;
-  TIP_PROVIDED: string;
-  ON_SCREEN_BEFORE_PAYMENT: string;
+  NO_TIP: String;
+  TIP_PROVIDED: String;
+  ON_SCREEN_BEFORE_PAYMENT: String;
 }
 
 interface PrintJobFlag {
-  FLAG_BILL: number;
-  FLAG_CUSTOMER: number;
-  FLAG_FORCE_SIGNATURE: number;
-  FLAG_MERCHANT: number;
-  FLAG_NO_SIGNATURE: number;
-  FLAG_NONE: number;
-  FLAG_REFUND: number;
-  FLAG_REPRINT: number;
+  FLAG_BILL: Number;
+  FLAG_CUSTOMER: Number;
+  FLAG_FORCE_SIGNATURE: Number;
+  FLAG_MERCHANT: Number;
+  FLAG_NO_SIGNATURE: Number;
+  FLAG_NONE: Number;
+  FLAG_REFUND: Number;
+  FLAG_REPRINT: Number;
 }
 
 interface SaleOption {
-  amount: number;
-  externalPaymentId?: string;
-  generateExternalPaymentId?: boolean;
-  cardEntryMethods?: number;
-  disableRestartTransactionOnFail?: boolean;
-  disableDuplicateChecking?: boolean;
-  disablePrinting?: boolean;
-  disableReceiptSelection?: boolean;
-  signatureEntryLocation?: string;
-  signatureThreshold?: number;
-  autoAcceptSignature?: boolean;
-  tipAmount?: number;
-  tippableAmount?: number;
-  tipMode?: string;
+  amount: Number;
+  externalPaymentId?: String;
+  generateExternalPaymentId?: Boolean;
+  cardEntryMethods?: Number;
+  disableRestartTransactionOnFail?: Boolean;
+  disableDuplicateChecking?: Boolean;
+  disablePrinting?: Boolean;
+  disableReceiptSelection?: Boolean;
+  signatureEntryLocation?: String;
+  signatureThreshold?: Number;
+  autoAcceptSignature?: Boolean;
+  tipAmount?: Number;
+  tippableAmount?: Number;
+  tipMode?: String;
   tipSuggestions?: Array<TipSuggestion>;
-  printReceipt?: boolean;
+  printReceipt?: Boolean;
 }
 
 interface SaleResult extends TransactionResult {
@@ -142,11 +146,11 @@ interface SaleResult extends TransactionResult {
 }
 
 interface RefundPaymentOption {
-  paymentId: string;
-  orderId: string;
-  amount?: number;
-  setFullRefund?: boolean;
-  printReceipt?: boolean;
+  paymentId: String;
+  orderId: String;
+  amount?: Number;
+  setFullRefund?: Boolean;
+  printReceipt?: Boolean;
 }
 
 interface RefundPaymentResult extends TransactionResult {
@@ -154,12 +158,12 @@ interface RefundPaymentResult extends TransactionResult {
 }
 
 interface ManualRefundOption {
-  amount: number;
-  externalPaymentId?: string;
-  generateExternalPaymentId?: boolean;
-  cardEntryMethods?: number;
-  disableRestartTransactionOnFail?: boolean;
-  printReceipt?: boolean;
+  amount: Number;
+  externalPaymentId?: String;
+  generateExternalPaymentId?: Boolean;
+  cardEntryMethods?: Number;
+  disableRestartTransactionOnFail?: Boolean;
+  printReceipt?: Boolean;
 }
 
 interface ManualRefundResult extends TransactionResult {
@@ -167,30 +171,30 @@ interface ManualRefundResult extends TransactionResult {
 }
 
 interface VoidPaymentOption {
-  paymentId: string;
-  orderId: string;
-  voidReason: string;
-  printReceipt?: boolean;
+  paymentId: String;
+  orderId: String;
+  voidReason: String;
+  printReceipt?: Boolean;
 }
 
 interface VoidPaymentResult extends TransactionResult {
-  paymentId: string;
+  paymentId: String;
 }
 
 interface VoidPaymentRefundOption {
-  paymentId: string;
-  orderId: string;
+  paymentId: String;
+  orderId: String;
 }
 
 interface VoidPaymentRefundResult extends TransactionResult {
-  paymentId: string;
-  refundId: string;
+  paymentId: String;
+  refundId: String;
 }
 
 interface PrintPaymentOption {
-  orderId: string;
-  paymentId: string;
-  flags?: Array<number>;
+  orderId: String;
+  paymentId: String;
+  flags?: Array<Number>;
 }
 
 /**
@@ -201,34 +205,42 @@ declare const _default: {
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   /**
   * Obtains authentication data from the Clover service.
-  * @param {boolean} [forceValidateToken = false] Flag to validate against API, increases latency, use only when needed.
-  * @param {number} [timeout = 10000] Timeout in milliseconds.
+  * @param {Boolean} [forceValidateToken = false] Flag to validate against API, increases latency, use only when needed.
+  * @param {Number} [timeout = 10000] Timeout in milliseconds.
   * @returns {Promise} A promise that resolves to an AuthenticationResult.
   */
-  authenticate: (forceValidateToken?: boolean, timeout?: number) => Promise<AuthenticationResult>;
+  authenticate: (forceValidateToken?: Boolean, timeout?: Number) => Promise<AuthenticationResult>;
   /**
    * Obtains Merchant Info from the Clover service.
    * @returns {Promise} A promise that resolves to a MerchantResult.
    */
   getMerchant: () => Promise<MerchantResult>;
-  enableCustomerMode: () => void;
-  disableCustomerMode: () => void;
-  print: (imagePath: string) => Promise<object>;
-  printPayment: (option: PrintPaymentOption) => void;
+  enableCustomerMode: () => Void;
+  disableCustomerMode: () => Void;
+  print: (imagePath: String) => Promise<Object>;
+  printPayment: (option: PrintPaymentOption) => Void;
   /**
    * Obtains required Android runtime permissions, only needed if targeting API > 25.
    * @returns {Promise<Result>} A promise that resolves to a Result.
    */
   startAccountChooserIfNeeded: () => Promise<Result>;
+  /**
+   * Registers the Clover barcode scanner BroadcastReceiver and registers the LifecycleEventListener for cleanup
+   */
+  registerScanner: () => Void;
+  /**
+   * Unregisters the Barcode Event LifecycleEventListener
+   */
+  unregisterScanner: () => Void;
 
   // Payment Methods ///////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   /**
    * Readies the Clover Bridge for sending payment requests to Clover device. Must be called before calling any payment method and should be 
    * called as soon as possible.
-   * @param {string} raid Remote Application Id. Obtained from Clover App dashboard.
+   * @param {String} raid Remote Application Id. Obtained from Clover App dashboard.
    */
-  initializePaymentConnector: (raid: string) => void;
+  initializePaymentConnector: (raid: String) => Void;
   sale: (option: SaleOption) => Promise<SaleResult>;
   refundPayment: (option: RefundPaymentOption) => Promise<RefundPaymentResult>;
   manualRefund: (option: ManualRefundOption) => Promise<ManualRefundResult>;
@@ -237,13 +249,22 @@ declare const _default: {
   /**
    * Forces the SPA to close
    */
-  cancelSPA: () => void;
+  cancelSPA: () => Void;
 
   // Constant Methods //////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////
-  isFlex: () => boolean;
-  isMini: () => boolean;
-  getSpaVersion: () => string;
+  isFlex: () => Boolean;
+  isMini: () => Boolean;
+  getSpaVersion: () => String;
+
+  // Hooks /////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
+  /**
+   * Manages Clover barcode scanner and runs callback if enabled.
+   * @param {Function} callback Function called on scan if enabled is true.
+   * @param {Boolean} [enabled = false] Whether or not to register the callback listener.
+   */
+  useScanner: (callback: Function, enabled?: Boolean) => Void;
 
   // Enums/Constants ///////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,6 +289,10 @@ declare const _default: {
    * https://clover.github.io/clover-android-sdk/com/clover/sdk/v1/printer/job/PrintJob.html
    */
   PRINT_JOB_FLAG: PrintJobFlag;
+  /**
+   * Bridge Emitted Events
+   */
+  EVENT: BridgeEvent
 }
 
 export default _default;

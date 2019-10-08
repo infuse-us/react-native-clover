@@ -6,8 +6,10 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.RemoteException;
@@ -26,8 +28,10 @@ import com.clover.sdk.v1.printer.job.StaticReceiptPrintJob;
 import com.clover.sdk.v3.order.Order;
 import com.clover.sdk.v3.order.OrderConnector;
 import com.clover.sdk.v3.payments.Payment;
+import com.clover.sdk.v3.scanner.BarcodeResult;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.NoSuchKeyException;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -37,6 +41,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.UnexpectedNativeTypeException;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.infuse.clover.bridge.payments.BridgePaymentConnector;
 
 import java.io.IOException;
@@ -152,6 +157,17 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void registerScanner() {
+        mContext.addLifecycleEventListener(listener);
+    }
+
+    @ReactMethod
+    public void unregisterScanner() {
+        mContext.unregisterReceiver(barcodeReceiver);
+        mContext.removeLifecycleEventListener(listener);
+    }
+
+    @ReactMethod
     public void initializePaymentConnector(String raid) {
         bridgePaymentConnector.initialize(mContext, raid);
     }
@@ -253,5 +269,34 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
         }
 
         public void onNewIntent(Intent intent) { }
+    };
+
+    private BroadcastReceiver barcodeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            BarcodeResult barcodeResult = new BarcodeResult(intent);
+            if (barcodeResult.isBarcodeAction()) {
+                String barcode = barcodeResult.getBarcode();
+                Log.d(TAG, barcode);
+                mContext
+                        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                        .emit(Constants.EVENT_BARCODE_SCANNER, barcode);
+            }
+        }
+    };
+
+    private LifecycleEventListener listener = new LifecycleEventListener() {
+        @Override
+        public void onHostResume() {
+            mContext.registerReceiver(barcodeReceiver, new IntentFilter(BarcodeResult.INTENT_ACTION));
+        }
+
+        @Override
+        public void onHostPause() {
+            mContext.unregisterReceiver(barcodeReceiver);
+        }
+
+        @Override
+        public void onHostDestroy() { }
     };
 }

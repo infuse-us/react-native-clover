@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.0.9](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.9%0Dv0.0.8) - (2019-10-8)
+
+### Added
+- Add Scanning functionality to Clover Bridge, use `registerScanner` to activate and then listen to `CLOVER.EVENT.BARCODE_SCANNER`. Remember to call `unregisterScanner` when cleaning up. Or use the handy `useScanner` hook.
+
 ## [0.0.8](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.8%0Dv0.0.7) - (2019-09-24)
 
 ### Added
