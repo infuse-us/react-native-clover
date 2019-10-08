@@ -31,7 +31,10 @@ React Native native module for the [Clover SDK](https://github.com/clover/clover
 
 ## Usage
 ```javascript
-import Clover from '@infuse/react-native-clover';
+import Clover, { useScanner } from '@infuse/react-native-clover';
+
+// Hook to register and listen to connected Clover scanner, tested on flex and mini gen 2
+useScanner(callback, enabled);
 
 Clover.authenticate(forceValidateToken: Boolean = false, timeout: Number = 10000) => ({
   success: Boolean,
@@ -56,6 +59,10 @@ Clover.printPayment(option);
 
 // Use this in situations where you are not ensured to have account access permission, API 26+
 Clover.startAccountChooserIfNeeded().then({ success: bool } => { ... });
+
+// Register Scanner for listening to CLOVER.EVENT.BARCODE_SCANNER, tested on Flex and Mini Gen 2
+Clover.registerScanner();
+Clover.unregisterScanner();
 
 Clover.isFlex();
 Clover.isMini();
@@ -170,6 +177,8 @@ Clover.voidPayment(option).then(result => {});
     * `TIP_PROVIDED`
     * `ON_SCREEN_BEFORE_PAYMENT`
 * [PRINT_JOB_FLAG](https://clover.github.io/clover-android-sdk/com/clover/sdk/v1/printer/job/PrintJob.html)
+* `EVENT`
+    * `BARCODE_SCANNER`
   
 ## Troubleshooting
 

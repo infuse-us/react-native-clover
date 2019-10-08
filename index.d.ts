@@ -197,6 +197,15 @@ interface PrintPaymentOption {
   flags?: Array<Number>;
 }
 
+// // Hooks /////////////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Manages Clover barcode scanner and runs callback if enabled.
+ * @param {Function} callback Function called on scan if enabled is true.
+ * @param {Boolean} [enabled = false] Whether or not to register the callback listener.
+ */
+export const useScanner: Function;
+
 /**
  * Another blah test
  */
@@ -256,15 +265,6 @@ declare const _default: {
   isFlex: () => Boolean;
   isMini: () => Boolean;
   getSpaVersion: () => String;
-
-  // Hooks /////////////////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////////////////////////////
-  /**
-   * Manages Clover barcode scanner and runs callback if enabled.
-   * @param {Function} callback Function called on scan if enabled is true.
-   * @param {Boolean} [enabled = false] Whether or not to register the callback listener.
-   */
-  useScanner: (callback: Function, enabled?: Boolean) => Void;
 
   // Enums/Constants ///////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////
