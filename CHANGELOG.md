@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.10](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.10%0Dv0.0.9) - (2019-10-8)
+
+### Added
+- Readme text for scanner functionality
+
+### Changed
+- Moved `useScanner` as a named export rather than part of the default object.
+
 ## [0.0.9](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.9%0Dv0.0.8) - (2019-10-8)
 
 ### Added
