@@ -33,14 +33,20 @@ class Payments {
 
     static WritableMap mapPayment(Payment payment) {
         WritableMap map = Arguments.createMap();
-
         map.putString("id", payment.getId());
         map.putString("externalPaymentId", payment.getExternalPaymentId());
         map.putInt("amount", payment.getAmount().intValue());
         map.putString("createdTime", payment.getCreatedTime().toString());
 
         map.putBoolean("offline", payment.getOffline());
-        map.putInt("tipAmount", payment.getTipAmount().intValue());
+
+        // Check for tip amount, flex/mini2 and station 2018 format differently
+        // For some reason hasTipAmount returns true even when null
+        int tipAmount = 0;
+        if (payment.getTipAmount() != null) {
+            tipAmount = payment.getTipAmount().intValue();
+        }
+        map.putInt("tipAmount", tipAmount);
         // clientCreatedTime seems to be null
         // modifiedTime seems to be null
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.0.11](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.11%0Dv0.0.10) - (2019-10-8)
+
+### Fixed
+- Fix payment.tipAmount mapping due to Station 2018 setting tipAmount to null rather than 0.
+
 ## [0.0.10](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.10%0Dv0.0.9) - (2019-10-8)
 
 ### Added
