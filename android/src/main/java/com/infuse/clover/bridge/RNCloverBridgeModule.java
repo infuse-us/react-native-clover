@@ -163,7 +163,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void unregisterScanner() {
-        mContext.unregisterReceiver(barcodeReceiver);
+        unregisterReceiver();
         mContext.removeLifecycleEventListener(listener);
     }
 
@@ -256,6 +256,12 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
         return BridgeServiceConnector.getAccount(mContext);
     }
 
+    private void unregisterReceiver() {
+        try {
+            mContext.unregisterReceiver(barcodeReceiver);
+        } catch (IllegalArgumentException e) { }
+    }
+
     private final ActivityEventListener activityEventListener = new ActivityEventListener() {
         @Deprecated
         public void onActivityResult(int requestCode, int resultCode, Intent data) { }
@@ -293,7 +299,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
 
         @Override
         public void onHostPause() {
-            mContext.unregisterReceiver(barcodeReceiver);
+            unregisterReceiver();
         }
 
         @Override

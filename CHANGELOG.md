@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.0.12](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.12%0Dv0.0.11) - (2019-10-25)
+
+### Fixed
+- Fix crash that occurs due to attempting to unregister a non-registered broadcast receiver.
+
 ## [0.0.11](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.11%0Dv0.0.10) - (2019-10-8)
 
 ### Fixed
