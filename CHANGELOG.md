@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.0.13](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.13%0Dv0.0.12) - (2019-12-10)
+
+### Changed
+- Removed private flag from package.json.
+
 ## [0.0.12](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.12%0Dv0.0.11) - (2019-10-25)
 
 ### Fixed
