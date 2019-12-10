@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.0.14](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.14%0Dv0.0.13) - (2019-12-10)
+
+### Changed
+- Changed readme to reflect publish.
+
 ## [0.0.13](https://bitbucket.org/infuse-team/react-native-clover/compare/v0.0.13%0Dv0.0.12) - (2019-12-10)
 
 ### Changed

@@ -5,7 +5,7 @@ React Native native module for the [Clover SDK](https://github.com/clover/clover
 
 ## Getting started
 
-`$ yarn add https://bitbucket.org/infuse-team/react-native-clover.git`
+`$ yarn add @infuse/react-native-clover`
 
 ### Mostly automatic installation (Pre-0.60)
 

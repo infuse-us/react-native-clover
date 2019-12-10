@@ -1,7 +1,7 @@
 {
   "name": "@infuse/react-native-clover",
   "title": "React Native Clover",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "React Native native module for Clover SDK",
   "main": "index.js",
   "repository": {
