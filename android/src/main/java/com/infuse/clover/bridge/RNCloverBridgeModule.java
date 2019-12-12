@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.RemoteException;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -27,6 +28,7 @@ import com.clover.sdk.v1.printer.job.StaticPaymentPrintJob;
 import com.clover.sdk.v1.printer.job.StaticReceiptPrintJob;
 import com.clover.sdk.v3.order.Order;
 import com.clover.sdk.v3.order.OrderConnector;
+import com.clover.sdk.v3.order.OrderContract;
 import com.clover.sdk.v3.payments.Payment;
 import com.clover.sdk.v3.scanner.BarcodeResult;
 import com.facebook.react.bridge.ActivityEventListener;
@@ -40,9 +42,15 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.UnexpectedNativeTypeException;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.infuse.clover.bridge.payments.BridgePaymentConnector;
+import com.infuse.clover.bridge.orders.OrderUtils;
+import com.infuse.clover.bridge.utils.MapUtil;
+
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.Map;
@@ -229,6 +237,70 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
         if (currentActivity != null) {
             currentActivity.sendBroadcast(intent);
         }
+    }
+
+    /**
+     * Query Clover database for orders that match sorting or searching criteria.
+     *
+     * @param  limit          the number of orders that will be returned
+     * @param  offset         excludes the first N records
+     * @param  sortCategory   the category that orders will be sorted against
+     * @param  sortOrder      sort order - ASC or DESC
+     * @param  searchCategory the category that orders will be searched against
+     * @param  searchTerm     the keyword that orders will be searched against
+     *
+     * @returns {Promise} - a Promise that if resolved, contains an array of matching orders
+     */
+    @ReactMethod
+    public void searchOrders(int limit, int offset, String sortCategory, String sortOrder, String searchCategory, String searchTerm, Promise promise) {
+        OrderConnector orderConnector = new BridgeServiceConnector().getOrderConnector(mContext);
+        try {
+            WritableMap map = Arguments.createMap();
+            WritableArray orders = Arguments.createArray();
+
+            Cursor cursor = mContext
+                    .getContentResolver()
+                    .query(OrderContract.Summaries.contentUriWithAccount(getAccount())
+                            , new String[] {
+                                    OrderContract.Summaries.ID,
+                                    OrderContract.Summaries.LAST_MODIFIED,
+                                    OrderContract.Summaries.TENDERS,
+                                    OrderContract.Summaries.TOTAL,
+                                    OrderContract.Summaries.NOTE,
+                            }
+                            , OrderUtils.buildSearchSelection(searchCategory, searchTerm)
+                            , null
+                            , OrderUtils.buildSortOrder(limit, offset, sortCategory, sortOrder));
+
+            while(cursor.moveToNext()){
+                Order order = null;
+
+                String orderId = cursor.getString(cursor.getColumnIndex(OrderContract.Summaries.ID));
+                try {
+                    order = orderConnector.getOrder(orderId);
+                    order.getJSONObject();
+                } catch (RemoteException | ClientException | ServiceException | BindingException e) {
+                    e.printStackTrace();
+                    promise.reject(TAG, e);
+                }
+                if (order != null) {
+                    Map<String, Object>  mappedOrder = MapUtil.toMap(order.getJSONObject());
+                    orders.pushMap(MapUtil.toWritableMap(mappedOrder));
+                }
+            }
+
+            map.putArray("orders", orders);
+            promise.resolve(map);
+
+            cursor.close();
+        } catch (IllegalViewOperationException e) {
+            e.printStackTrace();
+            promise.reject(TAG, e);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            promise.reject(TAG, e);
+        }
+        orderConnector.disconnect();
     }
 
     @ReactMethod
