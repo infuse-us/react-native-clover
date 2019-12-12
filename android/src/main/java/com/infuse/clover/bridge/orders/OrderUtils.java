@@ -20,18 +20,6 @@ public class OrderUtils {
         }
 
         String selection = String.format("%s LIKE '%%%s%%'", searchCategory, searchTerm);
-        // Custom SQL for Search by UPC
-        if(searchCategory.equals("UPC")) {
-            searchCategory = "Note";
-            selection = String.format("select rtrim(trim(ltrim(replace(%s, replace(%s, rtrim(%s, replace(%s, '|||', '' ) ), ''), ''), 'UPCs:')), '|||') LIKE '%%%s%%'",
-                    searchCategory, searchCategory, searchCategory, searchCategory, searchTerm);
-        }
-        // Custom SQL for Search by Item Name
-        if(searchCategory.equals("Item Name")) {
-            searchCategory = "Note";
-            selection = String.format("select trim(ltrim(trim(replace(%s, rtrim(%s, replace(%s, '|||', '' ) ), '')), 'Names:')) LIKE '%%%s%%'",
-                    searchCategory, searchCategory, searchCategory, searchTerm);
-        }
 
         // Search by modified date
         if(searchCategory.equals("LAST_MODIFIED")) {
