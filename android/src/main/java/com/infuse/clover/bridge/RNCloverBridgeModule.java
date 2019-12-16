@@ -261,13 +261,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
             Cursor cursor = mContext
                     .getContentResolver()
                     .query(OrderContract.Summaries.contentUriWithAccount(getAccount())
-                            , new String[] {
-                                    OrderContract.Summaries.ID,
-                                    OrderContract.Summaries.LAST_MODIFIED,
-                                    OrderContract.Summaries.TENDERS,
-                                    OrderContract.Summaries.TOTAL,
-                                    OrderContract.Summaries.NOTE,
-                            }
+                            , OrderUtils.searchableColumns()
                             , OrderUtils.buildSearchSelection(searchCategory, searchTerm)
                             , null
                             , OrderUtils.buildSortOrder(limit, offset, sortCategory, sortOrder));

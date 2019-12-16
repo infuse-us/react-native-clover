@@ -4,7 +4,17 @@ import com.clover.sdk.v3.order.OrderContract;
 
 public class OrderUtils {
 
-     public static String buildSortOrder(int limit, int offset, String sortCategory, String sortOrder) {
+    public static String[] searchableColumns() {
+        return new String[] {
+                OrderContract.Summaries.ID,
+                OrderContract.Summaries.LAST_MODIFIED,
+                OrderContract.Summaries.TENDERS,
+                OrderContract.Summaries.TOTAL,
+                OrderContract.Summaries.NOTE,
+        };
+    }
+
+    public static String buildSortOrder(int limit, int offset, String sortCategory, String sortOrder) {
         if(sortOrder == null || sortOrder.isEmpty()) {
             sortCategory = OrderContract.Summaries.LAST_MODIFIED;
             sortOrder = "DESC";
