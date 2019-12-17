@@ -42,7 +42,7 @@ import Clover from '@infuse/react-native-clover';
       null,           // sort category
       null,           // sort order
       null,           // search category, i.e. 'CREATED_TIME', 'ID'
-      null            // search term, i.e '1570728546000-1580737599999'
+      null            // search term, i.e '1570728546000-1580737599999', 'KDJ'
     ).then(({ orders }) => { ... });
 ```
 You can query Clover database for orders that match sorting or searching criteria. This method can also be used as a generic fetch method for Clover orders.
@@ -81,16 +81,17 @@ The method supports these categories for sorting and searching:
 More information here: https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/order/OrderContract.SummaryColumns.html
 
 If search category is `CREATED_TIME` or `LAST_MODIFIED`, you must provide start time and end time for the query to work. The search term has to be in format `'{startTime}-{endTime}'` where startTime and endTime are Unix timestamps in miliseconds. For example:
-  ```javascript
-   Clover.searchOrders(
-      50,             // limit
-      0,              // offset
-      null,           // sort category
-      null,           // sort order
-      'LAST_MODIFIED',
-      '1570728546000-1580737599999'
-    ).then(({ orders }) => { ... });
-  ```
+
+```javascript
+  Clover.searchOrders(
+    50,             // limit
+    0,              // offset
+    null,           // sort category
+    null,           // sort order
+    'LAST_MODIFIED',
+    '1570728546000-1580737599999'
+  ).then(({ orders }) => { ... });
+```
   The result orders are similar to what would be returned from Clover REST API call. The method also returns all column data from matching orders:
   ```javascript
    Clover.searchOrders(
