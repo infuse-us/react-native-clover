@@ -18,7 +18,7 @@ React Native native module for the [Clover SDK](https://github.com/clover/clover
 1. Open up `android/app/src/main/java/[...]/MainApplication.java`
   - Add `import com.infuse.clover.bridge.RNCloverBridgePackage;` to the imports at the top of the file
   - Add `new RNCloverBridgePackage()` to the list returned by the `getPackages()` method
-2. Append the following lines to `android/settings.gradle`:     V
+2. Append the following lines to `android/settings.gradle`:
   	```
   	include ':@infuse_react-native-clover'
   	project(':@infuse_react-native-clover').projectDir = new File(rootProject.projectDir, 	'../node_modules/@infuse/react-native-clover/android')
@@ -45,7 +45,7 @@ import Clover from '@infuse/react-native-clover';
       null            // search term, i.e '1570728546000-1580737599999'
     ).then(({ orders }) => { ... });
 ```
-You can query Clover database for orders that match sorting or searching criteria.
+You can query Clover database for orders that match sorting or searching criteria. This method can also be used as a generic fetch method for Clover orders.
 
 #### Arguments
 | Position   | Name               | Type             | Can be NULL        | Default            | Description                                       | 
@@ -59,28 +59,28 @@ You can query Clover database for orders that match sorting or searching criteri
 
 #### Supported Categories
 The method supports these categories for sorting and searching:
-  - AMOUNT_CREDITED
-  - AMOUNT_PAID
-  - AMOUNT_REFUNDED
-  - CREATED_TIME
-  - CURRENCY
-  - CUSTOMER_ID
-  - CUSTOMER_NAME
-  - DELETED
-  - EMPLOYEE_NAME
-  - ID
-  - LAST_MODIFIED
-  - NOTE
-  - ORDER_TYPE
-  - PAYMENT_STATE
-  - STATE
-  - TENDERS
-  - TITLE
-  - TOTAL
+  * AMOUNT_CREDITED
+  * AMOUNT_PAID
+  * AMOUNT_REFUNDED
+  * CREATED_TIME
+  * CURRENCY
+  * CUSTOMER_ID
+  * CUSTOMER_NAME
+  * DELETED
+  * EMPLOYEE_NAME
+  * ID
+  * LAST_MODIFIED
+  * NOTE
+  * ORDER_TYPE
+  * PAYMENT_STATE
+  * STATE
+  * TENDERS
+  * TITLE
+  * TOTAL
 
-  More information here: https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/order/OrderContract.SummaryColumns.html
+More information here: https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/order/OrderContract.SummaryColumns.html
 
-  If search category is `CREATED_TIME` or `LAST_MODIFIED`, you must provide start time and end time for the query to work. The search term has to be in format `'{startTime}-{endTime}'` where startTime and endTime are Unix timestamps in miliseconds. For example:
+If search category is `CREATED_TIME` or `LAST_MODIFIED`, you must provide start time and end time for the query to work. The search term has to be in format `'{startTime}-{endTime}'` where startTime and endTime are Unix timestamps in miliseconds. For example:
   ```javascript
    Clover.searchOrders(
       50,             // limit
