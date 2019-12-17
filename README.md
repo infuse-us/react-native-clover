@@ -121,20 +121,20 @@ Clover.searchOrders(
     ).then(({ orders }) => {});
 ```
 
-### Get merchant
+#### Get merchant
 ```javascript
 Clover.getMerchant().then({ data } => { ... });
 ```
-### Enter Customer Mode
+#### Enter Customer Mode
 ```javascript
 Clover.enableCustomerMode();
 Clover.disableCustomerMode();
 ```
-### Print from an image
+#### Print from an image
 ```javascript
 Clover.print(String imagePath).then(...);
 ```
-### Print with option
+#### Print with option
 ```javascript
 /**
  * Print Payment Option
@@ -145,13 +145,13 @@ Clover.print(String imagePath).then(...);
  **/
 Clover.printPayment(option);
 ```
-### Hook to register and listen to connected Clover scanner, tested on flex and mini gen 2
+#### Hook to register and listen to connected Clover scanner, tested on flex and mini gen 2
 ```javascript
 import Clover, { useScanner } from '@infuse/react-native-clover';
 
 useScanner(callback, enabled);
 ```
-### Authenticate with Clover
+#### Authenticate with Clover
 ```javascript
 Clover.authenticate(forceValidateToken: Boolean = false, timeout: Number = 10000) => ({
   success: Boolean,
@@ -159,27 +159,27 @@ Clover.authenticate(forceValidateToken: Boolean = false, timeout: Number = 10000
   errorMessage: String,
 })
 ```
-### Use this in situations where you are not ensured to have account access permission, API 26+
+#### Use this in situations where you are not ensured to have account access permission, API 26+
 ```javascript
 Clover.startAccountChooserIfNeeded().then({ success: bool } => { ... });
 ```
-### Register Scanner for listening to CLOVER.EVENT.BARCODE_SCANNER, tested on Flex and Mini Gen 2
+#### Register Scanner for listening to CLOVER.EVENT.BARCODE_SCANNER, tested on Flex and Mini Gen 2
 ```javascript
 Clover.registerScanner();
 Clover.unregisterScanner();
 ```
-### Helper methods to detect Clover device types
+#### Helper methods to detect Clover device types
 ```javascript
 Clover.isFlex();
 Clover.isMini();
 Clover.getSpaVersion();
 ```
 ## Payment Methods
-### This should be called as early as possible during app load before calling any payment method
+#### This should be called as early as possible during app load before calling any payment method
 ```javascript
 Clover.initializePaymentConnector(String raid);
 ```
-### Sale option
+#### Sale option
 ```javascript
 /**
  * Sale Option
@@ -216,7 +216,7 @@ Clover.initializePaymentConnector(String raid);
 Clover.sale(option).then(result => {});
 ```
 
-### Refund Payment option
+#### Refund Payment option
 ```javascript
 /**
  * Refund Payment Option
@@ -237,7 +237,7 @@ Clover.sale(option).then(result => {});
  */
 Clover.refundPayment(option).then(result => {});
 ```
-### Manual Refund
+#### Manual Refund
 ```javascript
 /**
  * Manual Refund Option
@@ -256,7 +256,7 @@ Clover.refundPayment(option).then(result => {});
  */
 Clover.manualRefund(option).then(result => {});
 ```
-### Void Payment
+#### Void Payment
 ```javascript
 /**
  * Void Payment Option
