@@ -18,7 +18,7 @@ React Native native module for the [Clover SDK](https://github.com/clover/clover
 1. Open up `android/app/src/main/java/[...]/MainApplication.java`
   - Add `import com.infuse.clover.bridge.RNCloverBridgePackage;` to the imports at the top of the file
   - Add `new RNCloverBridgePackage()` to the list returned by the `getPackages()` method
-2. Append the following lines to `android/settings.gradle`:
+2. Append the following lines to `android/settings.gradle`:     V
   	```
   	include ':@infuse_react-native-clover'
   	project(':@infuse_react-native-clover').projectDir = new File(rootProject.projectDir, 	'../node_modules/@infuse/react-native-clover/android')
@@ -30,24 +30,98 @@ React Native native module for the [Clover SDK](https://github.com/clover/clover
 
 
 ## Usage
+
+### Search Orders
+
 ```javascript
-import Clover, { useScanner } from '@infuse/react-native-clover';
+import Clover from '@infuse/react-native-clover';
 
-// Hook to register and listen to connected Clover scanner, tested on flex and mini gen 2
-useScanner(callback, enabled);
+ Clover.searchOrders(
+      50,             // limit
+      0,              // offset
+      null,           // sort category
+      null,           // sort order
+      null,           // search category, i.e. 'CREATED_TIME', 'ID'
+      null            // search term, i.e '1570728546000-1580737599999'
+    ).then(({ orders }) => { ... });
+```
+You can query Clover database for orders that match sorting or searching criteria.
 
-Clover.authenticate(forceValidateToken: Boolean = false, timeout: Number = 10000) => ({
-  success: Boolean,
-  authToken: String,
-  errorMessage: String,
-})
+#### Arguments
+| Position   | Name               | Type             | Can be NULL        | Default            | Description                                       | 
+| -----------| ------------------ | ---------------- | -------------------|------------------- | --------------------------------------------------|
+| 1          | Limit              | number           | No                 |      -             | The number of orders that will be returned        | 
+| 2          | Offset             | number           | No                 |      -             | Excludes the first N records                      | 
+| 3          | Sort Category      | string           | Yes                | 'LAST_MODIFIED'    | The category that orders will be sorted against   | 
+| 4          | Sort Order         | string           | Yes                |  'ASC'             | Sort order - ASC or DESC                          | 
+| 5          | Search Category    | string           | Yes                |   null             | The category that orders will be searched against | 
+| 6          | Search Term        | string           | Yes                |   null             | The keyword that orders will be searched against  | 
 
+#### Supported Categories
+The method supports these categories for sorting and searching:
+  - AMOUNT_CREDITED
+  - AMOUNT_PAID
+  - AMOUNT_REFUNDED
+  - CREATED_TIME
+  - CURRENCY
+  - CUSTOMER_ID
+  - CUSTOMER_NAME
+  - DELETED
+  - EMPLOYEE_NAME
+  - ID
+  - LAST_MODIFIED
+  - NOTE
+  - ORDER_TYPE
+  - PAYMENT_STATE
+  - STATE
+  - TENDERS
+  - TITLE
+  - TOTAL
+
+  More information here: https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/order/OrderContract.SummaryColumns.html
+
+  If search category is `CREATED_TIME` or `LAST_MODIFIED`, you must provide start time and end time for the query to work. The search term has to be in format `'{startTime}-{endTime}'` where startTime and endTime are Unix timestamps in miliseconds. For example:
+  ```javascript
+   Clover.searchOrders(
+      50,             // limit
+      0,              // offset
+      null,           // sort category
+      null,           // sort order
+      'LAST_MODIFIED',
+      '1570728546000-1580737599999'
+    ).then(({ orders }) => { ... });
+  ```
+  The result orders are similar to what would be returned from Clover REST API call. The method also returns all column data from matching orders:
+  ```javascript
+   Clover.searchOrders(
+      50,             // limit
+      0,              // offset
+      null,           // sort category
+      null,           // sort order
+      null,           // search category
+      null            // search term
+    ).then(({ allColumnData }) => { ... });
+  ```
+  An example:
+
+ ![all column data example](https://cdn-std.droplr.net/files/acc_717368/d9cQgm)
+
+
+### Get merchant
+```javascript
 Clover.getMerchant().then({ data } => { ... });
-
+```
+### Enter Customer Mode
+```javascript
 Clover.enableCustomerMode();
 Clover.disableCustomerMode();
-
+```
+### Print from an image
+```javascript
 Clover.print(String imagePath).then(...);
+```
+### Print with option
+```javascript
 /**
  * Print Payment Option
  * 
@@ -56,21 +130,43 @@ Clover.print(String imagePath).then(...);
  * flags: array - optional, array of PrintJob flags
  **/
 Clover.printPayment(option);
+```
+### Hook to register and listen to connected Clover scanner, tested on flex and mini gen 2
+```javascript
+import Clover, { useScanner } from '@infuse/react-native-clover';
 
-// Use this in situations where you are not ensured to have account access permission, API 26+
+useScanner(callback, enabled);
+```
+### Authenticate with Clover
+```javascript
+Clover.authenticate(forceValidateToken: Boolean = false, timeout: Number = 10000) => ({
+  success: Boolean,
+  authToken: String,
+  errorMessage: String,
+})
+```
+### Use this in situations where you are not ensured to have account access permission, API 26+
+```javascript
 Clover.startAccountChooserIfNeeded().then({ success: bool } => { ... });
-
-// Register Scanner for listening to CLOVER.EVENT.BARCODE_SCANNER, tested on Flex and Mini Gen 2
+```
+### Register Scanner for listening to CLOVER.EVENT.BARCODE_SCANNER, tested on Flex and Mini Gen 2
+```javascript
 Clover.registerScanner();
 Clover.unregisterScanner();
-
+```
+### Helper methods to detect Clover device types
+```javascript
 Clover.isFlex();
 Clover.isMini();
 Clover.getSpaVersion();
-
-// This should be called as early as possible during app load before calling any payment method
+```
+## Payment Methods
+### This should be called as early as possible during app load before calling any payment method
+```javascript
 Clover.initializePaymentConnector(String raid);
-
+```
+### Sale option
+```javascript
 /**
  * Sale Option
  *  
@@ -104,7 +200,10 @@ Clover.initializePaymentConnector(String raid);
  * payment: object
  */
 Clover.sale(option).then(result => {});
+```
 
+### Refund Payment option
+```javascript
 /**
  * Refund Payment Option
  * 
@@ -123,7 +222,9 @@ Clover.sale(option).then(result => {});
  * refund: object
  */
 Clover.refundPayment(option).then(result => {});
-
+```
+### Manual Refund
+```javascript
 /**
  * Manual Refund Option
  * 
@@ -140,7 +241,9 @@ Clover.refundPayment(option).then(result => {});
  * credit: object
  */
 Clover.manualRefund(option).then(result => {});
-
+```
+### Void Payment
+```javascript
 /**
  * Void Payment Option
  * 
@@ -159,8 +262,7 @@ Clover.manualRefund(option).then(result => {});
  */
 Clover.voidPayment(option).then(result => {});
 ```
-
-## Contants
+## Constants
 
 * `HARDWARE_SERIAL_NUMBER`
 * [CARD_ENTRY_METHODS](https://docs.clover.com/clover-platform/docs/using-per-transaction-settings#section--other-functions-)

@@ -285,8 +285,9 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
                         orders.pushMap(MapUtil.toWritableMap(mappedOrder));
                     }
                 }
+                System.out.println("all column data "+ columns);
                 map.putArray("orders", orders);
-                map.putArray("columns", columns);
+                map.putArray("allColumnData", columns);
                 promise.resolve(map);
                 cursor.close();
             }
