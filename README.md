@@ -104,9 +104,9 @@ If search category is `CREATED_TIME` or `LAST_MODIFIED`, you must provide start 
     null            // search term
   ).then(({ allColumnData }) => { ... });
 ```
-  Would return:
-
  ![all column data example](https://cdn-std.droplr.net/files/acc_717368/TLV5Ha)
+
+#### Example
 
 This will return 150 orders, omitting first 40, sorted by order total descendingly and are created between 2019/01/01 to 2019/12/31:
 
