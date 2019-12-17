@@ -104,10 +104,22 @@ If search category is `CREATED_TIME` or `LAST_MODIFIED`, you must provide start 
     null            // search term
   ).then(({ allColumnData }) => { ... });
 ```
-  An example:
+  Would return:
 
  ![all column data example](https://cdn-std.droplr.net/files/acc_717368/TLV5Ha)
 
+This will return 150 orders, omitting first 40, sorted by order total descendingly and are created between 2019/01/01 to 2019/12/31:
+
+```javascript
+Clover.searchOrders(
+      150,
+      40, 
+      'TOTAL,
+      'DESC,
+      'CREATED_TIME,
+      '1546329600000-1577779200000'
+    ).then(({ orders }) => {});
+```
 
 ### Get merchant
 ```javascript
