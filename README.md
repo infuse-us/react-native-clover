@@ -93,17 +93,17 @@ If search category is `CREATED_TIME` or `LAST_MODIFIED`, you must provide start 
   ).then(({ orders }) => { ... });
 ```
   The result orders are similar to what would be returned from Clover REST API call. The method also returns all column data from matching orders:
-  
-  ```javascript
-   Clover.searchOrders(
-      50,             // limit
-      0,              // offset
-      null,           // sort category
-      null,           // sort order
-      null,           // search category
-      null            // search term
-    ).then(({ allColumnData }) => { ... });
-  ```
+
+```javascript
+  Clover.searchOrders(
+    50,             // limit
+    0,              // offset
+    null,           // sort category
+    null,           // sort order
+    null,           // search category
+    null            // search term
+  ).then(({ allColumnData }) => { ... });
+```
   An example:
 
  ![all column data example](https://cdn-std.droplr.net/files/acc_717368/TLV5Ha)
