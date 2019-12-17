@@ -68,9 +68,8 @@ public class OrderUtils {
     }
 
 
-    public static WritableArray buildAllColumnsData(Cursor cursor) {
+    public static WritableArray buildAllColumnsData(Cursor cursor, WritableArray columns) {
 
-        WritableArray result = Arguments.createArray();
         WritableMap row = Arguments.createMap();
 
         String amountCredited = cursor.getString(cursor.getColumnIndex(OrderContract.Summaries.AMOUNT_CREDITED));
@@ -107,7 +106,7 @@ public class OrderUtils {
         row.putString("title", title);
         row.putString("total", total);
 
-        result.pushMap(row);
-        return result;
+        columns.pushMap(row);
+        return columns;
     }
 }

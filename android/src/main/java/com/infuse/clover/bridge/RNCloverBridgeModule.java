@@ -257,7 +257,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
         try {
             WritableMap map = Arguments.createMap();
             WritableArray orders = Arguments.createArray();
-            WritableArray columns = null;
+            WritableArray columns = Arguments.createArray();
 
             Cursor cursor = mContext
                     .getContentResolver()
@@ -270,7 +270,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
             if (cursor != null) {
                 while(cursor.moveToNext()){
                     Order order = null;
-                    columns = OrderUtils.buildAllColumnsData(cursor);
+                    OrderUtils.buildAllColumnsData(cursor, columns);
 
                     String orderId = cursor.getString(cursor.getColumnIndex(OrderContract.Summaries.ID));
                     try {
@@ -285,7 +285,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
                         orders.pushMap(MapUtil.toWritableMap(mappedOrder));
                     }
                 }
-                System.out.println("all column data "+ columns);
                 map.putArray("orders", orders);
                 map.putArray("allColumnData", columns);
                 promise.resolve(map);

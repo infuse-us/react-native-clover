@@ -104,7 +104,7 @@ The method supports these categories for sorting and searching:
   ```
   An example:
 
- ![all column data example](https://cdn-std.droplr.net/files/acc_717368/d9cQgm)
+ ![all column data example](https://cdn-std.droplr.net/files/acc_717368/TLV5Ha)
 
 
 ### Get merchant
