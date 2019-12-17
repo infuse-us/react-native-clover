@@ -257,6 +257,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
         try {
             WritableMap map = Arguments.createMap();
             WritableArray orders = Arguments.createArray();
+            WritableArray columns = null;
 
             Cursor cursor = mContext
                     .getContentResolver()
@@ -266,27 +267,29 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
                             , null
                             , OrderUtils.buildSortOrder(limit, offset, sortCategory, sortOrder));
 
-            while(cursor.moveToNext()){
-                Order order = null;
+            if (cursor != null) {
+                while(cursor.moveToNext()){
+                    Order order = null;
+                    columns = OrderUtils.buildAllColumnsData(cursor);
 
-                String orderId = cursor.getString(cursor.getColumnIndex(OrderContract.Summaries.ID));
-                try {
-                    order = orderConnector.getOrder(orderId);
-                    order.getJSONObject();
-                } catch (RemoteException | ClientException | ServiceException | BindingException e) {
-                    e.printStackTrace();
-                    promise.reject(TAG, e);
+                    String orderId = cursor.getString(cursor.getColumnIndex(OrderContract.Summaries.ID));
+                    try {
+                        order = orderConnector.getOrder(orderId);
+                        order.getJSONObject();
+                    } catch (RemoteException | ClientException | ServiceException | BindingException e) {
+                        e.printStackTrace();
+                        promise.reject(TAG, e);
+                    }
+                    if (order != null) {
+                        Map<String, Object>  mappedOrder = MapUtil.toMap(order.getJSONObject());
+                        orders.pushMap(MapUtil.toWritableMap(mappedOrder));
+                    }
                 }
-                if (order != null) {
-                    Map<String, Object>  mappedOrder = MapUtil.toMap(order.getJSONObject());
-                    orders.pushMap(MapUtil.toWritableMap(mappedOrder));
-                }
+                map.putArray("orders", orders);
+                map.putArray("columns", columns);
+                promise.resolve(map);
+                cursor.close();
             }
-
-            map.putArray("orders", orders);
-            promise.resolve(map);
-
-            cursor.close();
         } catch (IllegalViewOperationException e) {
             e.printStackTrace();
             promise.reject(TAG, e);
