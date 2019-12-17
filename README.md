@@ -114,9 +114,9 @@ This will return 150 orders, omitting first 40, sorted by order total descending
 Clover.searchOrders(
       150,
       40, 
-      'TOTAL,
-      'DESC,
-      'CREATED_TIME,
+      'TOTAL',
+      'DESC',
+      'CREATED_TIME',
       '1546329600000-1577779200000'
     ).then(({ orders }) => {});
 ```
