@@ -4,6 +4,7 @@ import android.os.Build;
 
 import com.clover.sdk.v1.Intents;
 import com.clover.sdk.v1.printer.job.PrintJob;
+import com.clover.sdk.v3.order.OrderContract;
 import com.clover.sdk.v3.order.VoidReason;
 import com.clover.sdk.v3.payments.DataEntryLocation;
 import com.clover.sdk.v3.payments.TipMode;
@@ -93,6 +94,34 @@ public class Constants {
             printJobFlags.putInt("FLAG_REFUND", PrintJob.FLAG_REFUND);
             printJobFlags.putInt("FLAG_REPRINT", PrintJob.FLAG_REPRINT);
             constants.put("PRINT_JOB_FLAG", printJobFlags);
+
+            // Expose searchable order columns
+            WritableMap ordersContractColumns = Arguments.createMap();
+            ordersContractColumns.putString("AMOUNT_CREDITED", OrderContract.Summaries.AMOUNT_CREDITED);
+            ordersContractColumns.putString("AMOUNT_PAID", OrderContract.Summaries.AMOUNT_PAID);
+            ordersContractColumns.putString("AMOUNT_REFUNDED", OrderContract.Summaries.AMOUNT_REFUNDED);
+            ordersContractColumns.putString("CREATED_TIME", OrderContract.Summaries.CREATED);
+            ordersContractColumns.putString("CURRENCY", OrderContract.Summaries.CURRENCY);
+            ordersContractColumns.putString("CUSTOMER_ID", OrderContract.Summaries.CUSTOMER_ID);
+            ordersContractColumns.putString("CUSTOMER_NAME", OrderContract.Summaries.CUSTOMER_NAME);
+            ordersContractColumns.putString("DELETED", OrderContract.Summaries.DELETED);
+            ordersContractColumns.putString("EMPLOYEE_NAME", OrderContract.Summaries.EMPLOYEE_NAME);
+            ordersContractColumns.putString("ID", OrderContract.Summaries.ID);
+            ordersContractColumns.putString("LAST_MODIFIED", OrderContract.Summaries.LAST_MODIFIED);
+            ordersContractColumns.putString("NOTE", OrderContract.Summaries.NOTE);
+            ordersContractColumns.putString("ORDER_TYPE", OrderContract.Summaries.ORDER_TYPE);
+            ordersContractColumns.putString("PAYMENT_STATE", OrderContract.Summaries.PAYMENT_STATE);
+            ordersContractColumns.putString("STATE", OrderContract.Summaries.STATE);
+            ordersContractColumns.putString("TENDERS",OrderContract.Summaries.TENDERS);
+            ordersContractColumns.putString("TITLE", OrderContract.Summaries.TITLE);
+            ordersContractColumns.putString("TOTAL", OrderContract.Summaries.TOTAL);
+            constants.put("SEARCHABLE_ORDERS_COLUMNS", ordersContractColumns);
+
+            // Expose Sort Order
+            WritableMap ordersSortOrder = Arguments.createMap();
+            ordersSortOrder.putString("ASC", "ASC");
+            ordersSortOrder.putString("DESC", "DESC");
+            constants.put("SEARCHABLE_ORDERS_SORT_ORDER", ordersSortOrder);
 
             return constants;
         }

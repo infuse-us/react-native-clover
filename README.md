@@ -88,7 +88,7 @@ If search category is `CREATED_TIME` or `LAST_MODIFIED`, you must provide start 
     0,              // offset
     null,           // sort category
     null,           // sort order
-    'LAST_MODIFIED',
+    Clover.SEARCHABLE_ORDERS_COLUMNS.LAST_MODIFIED,
     '1570728546000-1580737599999'
   ).then(({ orders }) => { ... });
 ```
@@ -116,9 +116,9 @@ This will return 150 orders, omitting first 40, sorted by order total descending
 Clover.searchOrders(
       150,
       40, 
-      'TOTAL',
-      'DESC',
-      'CREATED_TIME',
+      Clover.SEARCHABLE_ORDERS_COLUMNS.TOTAL,
+      Clover.SEARCHABLE_ORDERS_SORT_ORDER.DESC,
+      Clover.SEARCHABLE_ORDERS_COLUMNS.CREATED_TIME,
       '1546329600000-1577779200000'
     ).then(({ orders }) => {});
 ```
@@ -297,6 +297,28 @@ Clover.voidPayment(option).then(result => {});
 * [PRINT_JOB_FLAG](https://clover.github.io/clover-android-sdk/com/clover/sdk/v1/printer/job/PrintJob.html)
 * `EVENT`
     * `BARCODE_SCANNER`
+* [SEARCHABLE_ORDERS_COLUMNS](https://clover.github.io/clover-android-sdk/com/clover/sdk/v3/order/OrderContract.SummaryColumns.html)
+  * AMOUNT_CREDITED
+  * AMOUNT_PAID
+  * AMOUNT_REFUNDED
+  * CREATED_TIME
+  * CURRENCY
+  * CUSTOMER_ID
+  * CUSTOMER_NAME
+  * DELETED
+  * EMPLOYEE_NAME
+  * ID
+  * LAST_MODIFIED
+  * NOTE
+  * ORDER_TYPE
+  * PAYMENT_STATE
+  * STATE
+  * TENDERS
+  * TITLE
+  * TOTAL
+* SEARCHABLE_ORDERS_SORT_ORDER
+  * ASC
+  * DESC
   
 ## Troubleshooting
 
