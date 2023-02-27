@@ -29,6 +29,23 @@ interface MerchantResult extends Result {
   merchant: Merchant;
 }
 
+interface InventoryResult extends Result {
+  statusMessage?: String;
+  inventory: Inventory;
+}
+
+interface Inventory extends ObjectRef {
+  name: String;
+  quantity: Number;
+  price: Number;
+  sku: String;
+  barcode: String;
+  category: String;
+  taxRate: Number;
+  taxName: String;
+  taxable: Boolean;
+}
+
 interface Merchant extends ObjectRef {
   name: String;
   email: String;
@@ -64,7 +81,7 @@ interface Refund extends Transaction {
   payment: ObjectRef;
 }
 
-interface Credit extends Transaction { 
+interface Credit extends Transaction {
   order: ObjectRef;
   tender: Tender;
 }
@@ -94,15 +111,15 @@ interface VoidReason {
   DEVELOPER_PAY_TIP_ADJUST_FAILED: String;
   FAILED: String;
   GIFTCARD_LOAD_FAILED: String;
-  NOT_APPROVED: String; 
-  REJECT_DUPLICATE: String; 
-  REJECT_OFFLINE: String; 
+  NOT_APPROVED: String;
+  REJECT_DUPLICATE: String;
+  REJECT_OFFLINE: String;
   REJECT_PARTIAL_AUTH: String;
   REJECT_SIGNATURE: String;
-  TRANSPORT_ERROR: String; 
-  USER_CANCEL: String; 
-  USER_CUSTOMER_CANCEL: String; 
-  USER_GIFTCARD_LOAD_CANCEL: String; 
+  TRANSPORT_ERROR: String;
+  USER_CANCEL: String;
+  USER_CUSTOMER_CANCEL: String;
+  USER_GIFTCARD_LOAD_CANCEL: String;
 }
 
 interface TipMode {
@@ -224,6 +241,7 @@ declare const _default: {
    * @returns {Promise} A promise that resolves to a MerchantResult.
    */
   getMerchant: () => Promise<MerchantResult>;
+  getInventoryItems: () => Promise<InventoryResult>;
   enableCustomerMode: () => Void;
   disableCustomerMode: () => Void;
   print: (imagePath: String) => Promise<Object>;
@@ -245,7 +263,7 @@ declare const _default: {
   // Payment Methods ///////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   /**
-   * Readies the Clover Bridge for sending payment requests to Clover device. Must be called before calling any payment method and should be 
+   * Readies the Clover Bridge for sending payment requests to Clover device. Must be called before calling any payment method and should be
    * called as soon as possible.
    * @param {String} raid Remote Application Id. Obtained from Clover App dashboard.
    */
