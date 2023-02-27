@@ -110,7 +110,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
                 try {
                     CloverAuth.AuthResult result = CloverAuth.authenticate(
                             getCurrentActivity(),
-                            getAccount(),
                             forceValidateToken,
                             (long) timeout,
                             TimeUnit.MILLISECONDS
@@ -120,7 +119,7 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
                     map.putString("authToken", result.authToken);
                     map.putString("message", result.errorMessage);
                     promise.resolve(map);
-                } catch (OperationCanceledException | AuthenticatorException | IOException e) {
+                } catch (Exception e) {
                     Log.e(TAG, "authentication_error", e);
                     promise.reject("authentication_error", e.getMessage());
                 }
