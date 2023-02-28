@@ -8,7 +8,6 @@ import com.clover.sdk.util.CloverAccount;
 import com.clover.sdk.v1.ServiceConnector;
 import com.clover.sdk.v1.merchant.MerchantConnector;
 import com.clover.sdk.v3.order.OrderConnector;
-import com.clover.sdk.v3.inventory.InventoryConnector;
 
 public class BridgeServiceConnector implements ServiceConnector.OnServiceConnectedListener {
     private MerchantConnector merchantConnector;
@@ -38,17 +37,6 @@ public class BridgeServiceConnector implements ServiceConnector.OnServiceConnect
         merchantConnector = new MerchantConnector(context, account, this);
         merchantConnector.connect();
         return merchantConnector;
-    }
-
-    public InventoryConnector getInventoryConnector(Context context) {
-        Account account = getAccount(context);
-        if (inventoryConnector != null) {
-            inventoryConnector.disconnect();
-            inventoryConnector = null;
-        }
-        inventoryConnector = new InventoryConector(context, account, this);
-        inventoryConnector.connect();
-        return inventoryConnector;
     }
 
     @Override

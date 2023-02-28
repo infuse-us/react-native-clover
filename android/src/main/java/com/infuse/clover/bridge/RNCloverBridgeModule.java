@@ -103,11 +103,6 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getInventoryItems(final Promise promise) {
-        new BridgeServiceConnector().getInventoryConnector(mContext).getItems(new InventoryItemsCallbackTask(promise));
-    }
-
-    @ReactMethod
     public void authenticate(final boolean forceValidateToken, final int timeout, final Promise promise) {
         Thread authThread = new Thread(new Runnable() {
             @Override
