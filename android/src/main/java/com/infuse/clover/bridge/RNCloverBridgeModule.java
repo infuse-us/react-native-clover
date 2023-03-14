@@ -197,6 +197,20 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void getOrder(final String orderId) {
+        try {
+            OrderConnector orderConnector = new BridgeServiceConnector().getOrderConnector(mContext);
+            Order order = orderConnector.getOrder(orderId);
+
+            return order;
+        } catch (RemoteException | ClientException | ServiceException | BindingException e) {
+            Log.e(TAG, "", e);
+        } catch (NoSuchKeyException | UnexpectedNativeTypeException e) {
+            Log.e(TAG, "RN", e);
+        }
+    }
+
+    @ReactMethod
     public void printPayment(ReadableMap options) {
         try {
             OrderConnector orderConnector = new BridgeServiceConnector().getOrderConnector(mContext);
