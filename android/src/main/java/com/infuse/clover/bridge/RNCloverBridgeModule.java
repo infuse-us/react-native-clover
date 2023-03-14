@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.os.RemoteException;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import java.util.Optional;
 import android.view.WindowManager;
 
 import com.clover.sdk.util.CloverAccount;
@@ -197,16 +198,18 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getOrder(final String orderId) {
+    public void getOrder(final String orderId, final Promise promise) {
         try {
             OrderConnector orderConnector = new BridgeServiceConnector().getOrderConnector(mContext);
             Order order = orderConnector.getOrder(orderId);
 
-            return order;
+            promise.resolve(order);
         } catch (RemoteException | ClientException | ServiceException | BindingException e) {
             Log.e(TAG, "", e);
+            promise.reject("order_error", e.getMessage());
         } catch (NoSuchKeyException | UnexpectedNativeTypeException e) {
             Log.e(TAG, "RN", e);
+            promise.reject("order_error", e.getMessage());
         }
     }
 
