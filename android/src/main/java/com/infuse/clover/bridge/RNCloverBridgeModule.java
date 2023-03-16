@@ -203,7 +203,17 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
             OrderConnector orderConnector = new BridgeServiceConnector().getOrderConnector(mContext);
             Order order = orderConnector.getOrder(orderId);
 
-            promise.resolve(order);
+            WritableMap orderMap = Arguments.createMap();
+            orderMap.putString("id", order.getId());
+            orderMap.putString("currency", order.getCurrency());
+            orderMap.putLong("total", order.getTotal());
+
+            WritableMap map = Arguments.createMap();
+            map.putBoolean("success", result.errorMessage == null);
+            map.putMap("order", orderMap);
+            map.putString("message", result.errorMessage);
+
+            promise.resolve(map);
         } catch (RemoteException | ClientException | ServiceException | BindingException e) {
             Log.e(TAG, "", e);
             promise.reject("order_error", e.getMessage());
