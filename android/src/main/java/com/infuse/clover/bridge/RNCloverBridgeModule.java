@@ -28,6 +28,7 @@ import com.clover.sdk.v1.printer.job.StaticPaymentPrintJob;
 import com.clover.sdk.v1.printer.job.StaticReceiptPrintJob;
 import com.clover.sdk.v3.order.Order;
 import com.clover.sdk.v3.order.OrderConnector;
+import com.clover.sdk.v3.order.OrderType;
 import com.clover.sdk.v3.payments.Payment;
 import com.clover.sdk.v3.scanner.BarcodeResult;
 import com.facebook.react.bridge.ActivityEventListener;
@@ -203,17 +204,24 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
             OrderConnector orderConnector = new BridgeServiceConnector().getOrderConnector(mContext);
             Order order = orderConnector.getOrder(orderId);
 
+            WritableMap responseMap = Arguments.createMap();
             WritableMap orderMap = Arguments.createMap();
+            WritableMap orderTypeMap = Arguments.createMap();
+            OrderType orderType = order.getOrderType();
+
+            orderTypeMap.putString("id", orderType.getId());
+            orderTypeMap.putString("label", orderType.getLabel());
+
             orderMap.putString("id", order.getId());
             orderMap.putString("currency", order.getCurrency());
-            orderMap.putLong("total", order.getTotal());
+            orderMap.putDouble("total", order.getTotal());
+            orderMap.putString("state", order.getState());
+            orderMap.putString("testMode", order.getTestMode());
+            orderMap.putMap("type", orderTypeMap);
 
-            WritableMap map = Arguments.createMap();
-            map.putBoolean("success", result.errorMessage == null);
-            map.putMap("order", orderMap);
-            map.putString("message", result.errorMessage);
-
-            promise.resolve(map);
+            responseMap.putBoolean("success", true);
+            responseMap.putMap("order", orderMap);
+            promise.resolve(responseMap);
         } catch (RemoteException | ClientException | ServiceException | BindingException e) {
             Log.e(TAG, "", e);
             promise.reject("order_error", e.getMessage());

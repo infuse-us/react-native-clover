@@ -30,8 +30,7 @@ interface MerchantResult extends Result {
 }
 
 interface OrderResult extends Result {
-  statusMessage?: String;
-  order: {};
+  order: Order;
 }
 
 interface InventoryResult extends Result {
@@ -55,6 +54,17 @@ interface Merchant extends ObjectRef {
   name: String;
   email: String;
   location: MerchantLocation;
+}
+
+interface Order extends ObjectRef {
+  currency: String;
+  total: Number;
+  state: String;
+  testMode: String;
+  type: {
+    id: String;
+    label: String;
+  }
 }
 
 interface MerchantLocation {
@@ -246,7 +256,7 @@ declare const _default: {
    * @returns {Promise} A promise that resolves to a MerchantResult.
    */
   getMerchant: () => Promise<MerchantResult>;
-  getOrder: () => Promise<OrderResult>;
+  getOrder: (orderId: string) => Promise<OrderResult>;
   getInventoryItems: () => Promise<InventoryResult>;
   enableCustomerMode: () => Void;
   disableCustomerMode: () => Void;
