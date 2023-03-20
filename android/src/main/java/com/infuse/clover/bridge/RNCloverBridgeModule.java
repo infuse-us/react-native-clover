@@ -209,15 +209,16 @@ class RNCloverBridgeModule extends ReactContextBaseJavaModule {
             WritableMap orderTypeMap = Arguments.createMap();
             OrderType orderType = order.getOrderType();
 
-            orderTypeMap.putString("id", orderType.getId());
-            orderTypeMap.putString("label", orderType.getLabel());
-
             orderMap.putString("id", order.getId());
             orderMap.putString("currency", order.getCurrency());
             orderMap.putDouble("total", order.getTotal());
             orderMap.putString("state", order.getState());
-            orderMap.putString("testMode", order.getTestMode());
-            orderMap.putMap("type", orderTypeMap);
+            orderMap.putBoolean("testMode", order.getTestMode());
+            if (orderType != null) {
+                orderTypeMap.putString("id", orderType.getId());
+                orderTypeMap.putString("label", orderType.getLabel());
+                orderMap.putMap("type", orderTypeMap);
+            }
 
             responseMap.putBoolean("success", true);
             responseMap.putMap("order", orderMap);
