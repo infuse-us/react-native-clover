@@ -8,6 +8,8 @@ export default {
   authenticate: (force = false, timeout = 10000) =>
     RNCloverBridge.authenticate(force, timeout),
   getMerchant: () => RNCloverBridge.getMerchant(),
+  getOrder: (orderId) => RNCloverBridge.getOrder(orderId),
+  getInventoryItems: () => RNCloverBridge.getInventoryItems(),
   isFlex: () => RNCloverBridge.isFlex,
   isMini: () => RNCloverBridge.isMini,
   getSpaVersion: () => RNCloverBridge.getSpaVersion,
